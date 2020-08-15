@@ -96,20 +96,11 @@ class Query1 extends QueryTemplate {
     }
 }
 
-
-/**
- *
- * @author Kemper
- */
-public class AirlinesDataScienceRunner {
+class AirlinesDataScience {
 
     static FormattedOutput fout;
-    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws IOException {
-        
+
+    void play()  throws IOException{
         fout = new FormattedOutput();
         Query1 q1 = new Query1(fout); 
 //        Query1 q2 = new Query2(fout); 
@@ -131,10 +122,27 @@ public class AirlinesDataScienceRunner {
 //       q8.run(); 
 //       q9.run(); 
 
-     outResult(fout);        
+      outResult(fout);        
     }
-
+     
     void outResult(FormattedOutput fout){
         fout.writeAnswers();
     }    
+    
+}
+
+/**
+ *
+ * @author Kemper
+ */
+public class AirlinesDataScienceRunner {
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) throws IOException {
+        AirlinesDataScience ads = new AirlinesDataScience();
+        ads.play();
+    }
+
 }
