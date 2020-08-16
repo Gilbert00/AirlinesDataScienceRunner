@@ -20,7 +20,7 @@ public class ValidationTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         answers = new ArrayList<>();
-        File inputFile = new File("answers.txt");
+        File inputFile = new File("Q:\\Java-School\\AirlinesDataScienceRunner\\answers.txt");
 
         // Reads in the answers from answers.txt
         try (Scanner in = new Scanner(inputFile)) {

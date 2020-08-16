@@ -54,6 +54,15 @@ class QueryTemplate {
         QueryTemplate.fout = fout;
     }
     
+    public static boolean  isInt(String s) {
+        String s1 = s.trim();
+        if (s1.length() == 0) {
+            return false;
+        } else {
+            return s1.matches("^-?\\d+$");
+        }
+    }
+    
     protected void run() throws IOException {
  //       List<List<String>> records = new ArrayList<List<String>>();
         String[] values;
@@ -67,7 +76,7 @@ class QueryTemplate {
                 values = line.split(COMMA_DELIMITER);
 //                records.add(Arrays.asList(values));
                 if ( clearRecord(values) && ! canceledRecord(values) && ! divertedRecord(values) ) {
-                    addingRecordToHash(values);
+                    processingRecord(values);
                 }
             }
         } catch (IOException e) {
@@ -92,7 +101,7 @@ class QueryTemplate {
         return false;
     }
     
-    protected void addingRecordToHash(String[] record) {
+    protected void processingRecord(String[] record) {
 //TODO        
     }
     
@@ -106,7 +115,115 @@ class QueryTemplate {
     }
 }
 
+class Query3to8 extends QueryTemplate {
+    @Override    
+    protected boolean canceledRecord(String[] record) {
+        String sCanceled = record[BaseColumn.Cancelled.ordinal()];
+        String sCancelCode = record[BaseColumn.CancellationCode.ordinal()].trim();
+        boolean b = (isInt(sCanceled) && (new Integer(sCanceled))==1) || 
+                    sCancelCode.length()==0;
+        return b;
+    }
+}
+
+class Query7to8 extends Query3to8 {
+    @Override    
+    protected boolean divertedRecord(String[] record) {
+        String sDiverted = record[BaseColumn.Diverted.ordinal()];
+        return isInt(sDiverted) && (new Integer(sDiverted))==1;
+    }
+}
+
+
 class Query1 extends QueryTemplate {
+//    Query1(FormattedOutput fout) {
+//        super(fout);
+//    }
+}
+
+class Query2 extends QueryTemplate {
+//    Query1(FormattedOutput fout) {
+//        super(fout);
+//    }
+}
+
+class Query3 extends Query3to8 {
+//    Query1(FormattedOutput fout) {
+//        super(fout);
+//    }
+}
+
+class Query4 extends Query3to8 {
+//    Query1(FormattedOutput fout) {
+//        super(fout);
+//    }
+}
+
+class Query5 extends Query3to8 {
+//    Query1(FormattedOutput fout) {
+//        super(fout);
+//    }
+}
+
+class Query6 extends Query3to8 {
+//    Query1(FormattedOutput fout) {
+//        super(fout);
+//    }
+}
+
+class Query7 extends QueryTemplate {
+    int result = 0;
+
+    @Override    
+    protected boolean clearRecord(String[] record) {
+        String sDepDelay = record[BaseColumn.DepDelay.ordinal()];
+        String sArrDelay = record[BaseColumn.ArrDelay.ordinal()];
+        boolean b = isInt(sDepDelay) && isInt(sArrDelay);
+        return b;
+    }
+    
+    @Override    
+    protected boolean canceledRecord(String[] record) {
+        String sCanceled = record[BaseColumn.Cancelled.ordinal()];
+        String sCancelCode = record[BaseColumn.CancellationCode.ordinal()].trim();
+        boolean b = (isInt(sCanceled) && (new Integer(sCanceled))==1) || 
+                    sCancelCode.length()>0;
+        return b;
+    }
+    
+    @Override    
+    protected boolean divertedRecord(String[] record) {
+        String sDiverted = record[BaseColumn.Diverted.ordinal()];
+        return isInt(sDiverted) && (new Integer(sDiverted))==1;
+    }
+    
+    @Override    
+    protected void processingRecord(String[] record) {
+        String sUniqueCarrier = record[BaseColumn.UniqueCarrier.ordinal()].trim();
+        if (sUniqueCarrier.equals("AA")){
+           int iDepDelay = new Integer(record[BaseColumn.DepDelay.ordinal()]);
+           int iArrDelay = new Integer(record[BaseColumn.ArrDelay.ordinal()]);
+           
+           if (((iDepDelay>60 && iArrDelay>60) ||
+                (iDepDelay>0 && iArrDelay>0 && iDepDelay+iArrDelay>60)) ) {
+               result++;
+           }
+        }
+    }
+
+    @Override    
+    protected void writeResult(FormattedOutput fout) {
+        fout.addAnswer(7, result);
+    }
+}
+
+class Query8 extends Query7to8 {
+//    Query1(FormattedOutput fout) {
+//        super(fout);
+//    }
+}
+
+class Query9 extends QueryTemplate {
 //    Query1(FormattedOutput fout) {
 //        super(fout);
 //    }
@@ -121,24 +238,24 @@ class AirlinesDataScience {
         QueryTemplate.setFOut(fout); 
         
         Query1 q1 = new Query1(); 
-//        Query1 q2 = new Query2(fout); 
-//        Query1 q3 = new Query3(fout); 
-//        Query1 q4 = new Query4(fout); 
-//        Query1 q5 = new Query5(fout); 
-//        Query1 q6 = new Query6(fout); 
-//        Query1 q7 = new Query7(fout); 
-//        Query1 q8 = new Query8(fout); 
-//        Query1 q9 = new Query9(fout);
+        Query2 q2 = new Query2(); 
+        Query3 q3 = new Query3(); 
+        Query4 q4 = new Query4(); 
+        Query5 q5 = new Query5(); 
+        Query6 q6 = new Query6(); 
+        Query7 q7 = new Query7(); 
+        Query8 q8 = new Query8(); 
+        Query9 q9 = new Query9();
 
-       q1.run(); 
-//       q2.run(); 
-//       q3.run(); 
-//       q4.run(); 
-//       q5.run(); 
-//       q6.run(); 
-//       q7.run(); 
-//       q8.run(); 
-//       q9.run(); 
+        q1.run(); 
+        q2.run(); 
+        q3.run(); 
+        q4.run(); 
+        q5.run(); 
+        q6.run(); 
+        q7.run(); 
+        q8.run(); 
+        q9.run(); 
 
       outResult(fout);        
     }
