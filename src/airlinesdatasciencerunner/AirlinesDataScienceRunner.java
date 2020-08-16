@@ -8,37 +8,40 @@ package airlinesdatasciencerunner;
 import java.io.*;
 import java.util.*; 
 
+enum ColumnType {
+    INT, STR, DATE
+}
+
 enum BaseColumn {
-   DayofMonth(0),
-   DayOfWeek(1),
-   FlightDate(2),
-   UniqueCarrier(3),
-   TailNum(4),
-   OriginAirportID(5),
-   Origin(6),
-   OriginStateName(7),
-   DestAirportID(8),
-   Dest(9),
-   DestStateName(10),
-   DepTime(11),
-   DepDelay(12),
-   WheelsOff(13),
-   WheelsOn(14),
-   ArrTime(15),
-   ArrDelay(16),
-   Cancelled(17),
-   CancellationCode(18),
-   Diverted(19),
-   AirTime(20),
-   Distance(21)
+   DayofMonth(ColumnType.INT),
+   DayOfWeek(ColumnType.INT),
+   FlightDate(ColumnType.DATE),
+   UniqueCarrier(ColumnType.STR),
+   TailNum(ColumnType.STR),
+   OriginAirportID(ColumnType.INT),
+   Origin(ColumnType.STR),
+   OriginStateName(ColumnType.STR),
+   DestAirportID(ColumnType.INT),
+   Dest(ColumnType.STR),
+   DestStateName(ColumnType.STR),
+   DepTime(ColumnType.INT),
+   DepDelay(ColumnType.INT),
+   WheelsOff(ColumnType.INT),
+   WheelsOn(ColumnType.INT),
+   ArrTime(ColumnType.INT),
+   ArrDelay(ColumnType.INT),
+   Cancelled(ColumnType.INT),
+   CancellationCode(ColumnType.STR),
+   Diverted(ColumnType.INT),
+   AirTime(ColumnType.INT),
+   Distance(ColumnType.INT)
    ;
    
-   private short id;
+   private ColumnType type;
    
-   BaseColumn(int i) {id = (short)i; }
+   BaseColumn(ColumnType t) {type = t; }
    
-   short getID(){ return id; }
-   
+   ColumnType getType(){ return type; }
 }
 
 class QueryTemplate {
@@ -47,53 +50,66 @@ class QueryTemplate {
     protected static final String CSV_FILE = "Q:\\Java-School\\Project_2_DSWA\\flights_small.csv"; 
     protected static FormattedOutput fout;
     
-    QueryTemplate(FormattedOutput fout){
+    static void setFOut(FormattedOutput fout){
         QueryTemplate.fout = fout;
     }
     
     protected void run() throws IOException {
-
  //       List<List<String>> records = new ArrayList<List<String>>();
-
+        String[] values;
+ 
+        
+// BufferedReader reader = Files.newBufferedReader(Paths.get("src/main/resources/input.txt")) 
+// int buffer = 16384 * 16384;   1048576     
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_FILE))) {
             String line = "";
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(COMMA_DELIMITER);
+                values = line.split(COMMA_DELIMITER);
 //                records.add(Arrays.asList(values));
+                if ( clearRecord(values) && ! canceledRecord(values) && ! divertedRecord(values) ) {
+                    addingRecordToHash(values);
+                }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        calcQuery();
     }
     
     protected boolean clearRecord(String[] record) {
-        
-        return false;
+//TODO        
+        return true;
     }
     
     protected boolean canceledRecord(String[] record) {
-        
+//TODO        
+        return false;
+    }
+    
+    protected boolean divertedRecord(String[] record) {
+//TODO        
         return false;
     }
     
     protected void addingRecordToHash(String[] record) {
-        
+//TODO        
     }
     
-    protected void calcQuery(FormattedOutput fout) {
-        
-        writeResult(fout);        
+    protected void calcQuery() {
+//TODO        
+        writeResult(QueryTemplate.fout);        
     }
     
     protected void writeResult(FormattedOutput fout) {
-        
+//TODO        
     }
 }
 
 class Query1 extends QueryTemplate {
-    Query1(FormattedOutput fout) {
-        super(fout);
-    }
+//    Query1(FormattedOutput fout) {
+//        super(fout);
+//    }
 }
 
 class AirlinesDataScience {
@@ -102,7 +118,9 @@ class AirlinesDataScience {
 
     void play()  throws IOException{
         fout = new FormattedOutput();
-        Query1 q1 = new Query1(fout); 
+        QueryTemplate.setFOut(fout); 
+        
+        Query1 q1 = new Query1(); 
 //        Query1 q2 = new Query2(fout); 
 //        Query1 q3 = new Query3(fout); 
 //        Query1 q4 = new Query4(fout); 
