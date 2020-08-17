@@ -219,9 +219,37 @@ class Query7 extends Query7to8 {
 }
 
 class Query8 extends Query7to8 {
-//    Query1(FormattedOutput fout) {
-//        super(fout);
-//    }
+    int mDayOfMonth = 0;
+    int mDepDelay = 0;
+    String mTailNum = "";
+    
+    @Override    
+    protected boolean clearRecord(String[] record) {
+        String sDepDelay = record[BaseColumn.DepDelay.ordinal()];
+        String sDayOfMonth = record[BaseColumn.DayofMonth.ordinal()];
+        String sTailNum  = record[BaseColumn.TailNum.ordinal()].trim();       
+        String sArrDelay = record[BaseColumn.ArrDelay.ordinal()];
+        return isInt(sDepDelay) && isInt(sDayOfMonth) && isInt(sArrDelay) && sTailNum.length()>0;
+    }
+
+    @Override        
+    protected void processingRecord(String[] record) {
+        int iArrDelay = new Integer(record[BaseColumn.ArrDelay.ordinal()]);
+        if (iArrDelay<=0) {
+            int iDepDelay = new Integer(record[BaseColumn.DepDelay.ordinal()]);
+            if (iDepDelay > mDepDelay) {
+                mDepDelay = iDepDelay;
+                mDayOfMonth = new Integer(record[BaseColumn.DayofMonth.ordinal()]);
+                mTailNum = record[BaseColumn.TailNum.ordinal()].trim();       
+            }
+        }
+    }
+    
+    @Override        
+    protected void writeResult(FormattedOutput fout) {
+        String result = String.format("%d,%d,%s", mDayOfMonth, mDepDelay, mTailNum);
+        fout.addAnswer(8, result);
+    }
 }
 
 class Query9 extends QueryTemplate {
