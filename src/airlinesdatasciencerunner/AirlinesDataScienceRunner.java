@@ -180,8 +180,8 @@ class Query7 extends Query7to8 {
     @Override    
     protected boolean clearRecord(String[] record) {
         String sDepDelay = record[BaseColumn.DepDelay.ordinal()];
-        String sArrDelay = record[BaseColumn.ArrDelay.ordinal()];
-        return isInt(sDepDelay) && isInt(sArrDelay);
+//        String sArrDelay = record[BaseColumn.ArrDelay.ordinal()];
+        return isInt(sDepDelay); // && isInt(sArrDelay);
     }
     
 //    @Override    
@@ -204,9 +204,9 @@ class Query7 extends Query7to8 {
         String sUniqueCarrier = record[BaseColumn.UniqueCarrier.ordinal()].trim();
         if (sUniqueCarrier.equals("AA")){
            int iDepDelay = new Integer(record[BaseColumn.DepDelay.ordinal()]);
-           int iArrDelay = new Integer(record[BaseColumn.ArrDelay.ordinal()]);
+//           int iArrDelay = new Integer(record[BaseColumn.ArrDelay.ordinal()]);
            
-             if (iDepDelay>=60) {
+           if (iDepDelay>=60) {
                result++;
            }
         }
