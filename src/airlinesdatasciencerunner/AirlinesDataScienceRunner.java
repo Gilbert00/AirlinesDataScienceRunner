@@ -121,7 +121,7 @@ class Query3to8 extends QueryTemplate {
         String sCanceled = record[BaseColumn.Cancelled.ordinal()];
         String sCancelCode = record[BaseColumn.CancellationCode.ordinal()].trim();
         boolean b = (isInt(sCanceled) && (new Integer(sCanceled))==1) || 
-                    sCancelCode.length()==0;
+                    sCancelCode.length()>0;
         return b;
     }
 }
@@ -171,31 +171,33 @@ class Query6 extends Query3to8 {
 //    }
 }
 
-class Query7 extends QueryTemplate {
+class Query7 extends Query7to8 {
     int result = 0;
+//    String sUniqueCarrier;
+//    int iDepDelay;
+//    int iArrDelay
 
     @Override    
     protected boolean clearRecord(String[] record) {
         String sDepDelay = record[BaseColumn.DepDelay.ordinal()];
         String sArrDelay = record[BaseColumn.ArrDelay.ordinal()];
-        boolean b = isInt(sDepDelay) && isInt(sArrDelay);
-        return b;
+        return isInt(sDepDelay) && isInt(sArrDelay);
     }
     
-    @Override    
-    protected boolean canceledRecord(String[] record) {
-        String sCanceled = record[BaseColumn.Cancelled.ordinal()];
-        String sCancelCode = record[BaseColumn.CancellationCode.ordinal()].trim();
-        boolean b = (isInt(sCanceled) && (new Integer(sCanceled))==1) || 
-                    sCancelCode.length()>0;
-        return b;
-    }
-    
-    @Override    
-    protected boolean divertedRecord(String[] record) {
-        String sDiverted = record[BaseColumn.Diverted.ordinal()];
-        return isInt(sDiverted) && (new Integer(sDiverted))==1;
-    }
+//    @Override    
+//    protected boolean canceledRecord(String[] record) {
+//        String sCanceled = record[BaseColumn.Cancelled.ordinal()];
+//        String sCancelCode = record[BaseColumn.CancellationCode.ordinal()].trim();
+//        boolean b = (isInt(sCanceled) && (new Integer(sCanceled))==1) || 
+//                    sCancelCode.length()>0;
+//        return b;
+//    }
+//    
+//    @Override    
+//    protected boolean divertedRecord(String[] record) {
+//        String sDiverted = record[BaseColumn.Diverted.ordinal()];
+//        return isInt(sDiverted) && (new Integer(sDiverted))==1;
+//    }
     
     @Override    
     protected void processingRecord(String[] record) {
@@ -204,8 +206,7 @@ class Query7 extends QueryTemplate {
            int iDepDelay = new Integer(record[BaseColumn.DepDelay.ordinal()]);
            int iArrDelay = new Integer(record[BaseColumn.ArrDelay.ordinal()]);
            
-           if (((iDepDelay>60 && iArrDelay>60) ||
-                (iDepDelay>0 && iArrDelay>0 && iDepDelay+iArrDelay>60)) ) {
+             if (iDepDelay>=60) {
                result++;
            }
         }
