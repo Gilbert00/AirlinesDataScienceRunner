@@ -142,9 +142,41 @@ class Query1 extends QueryTemplate {
 }
 
 class Query2 extends QueryTemplate {
-//    Query1(FormattedOutput fout) {
-//        super(fout);
-//    }
+    Map<String,Integer> hash = new HashMap<String,Integer>();
+    List<Map.Entry<String,Integer>> list;
+    
+    @Override    
+    protected boolean clearRecord(String[] record) {
+        String sCancellationCode = record[BaseColumn.CancellationCode.ordinal()].trim();
+        return sCancellationCode.length() > 0;
+    }
+
+    @Override        
+    protected void processingRecord(String[] record) {
+        String sCancellationCode = record[BaseColumn.CancellationCode.ordinal()].trim();
+        Integer val = hash.get(sCancellationCode);
+        if (val!=null) {
+            val++;
+            hash.put(sCancellationCode, val);
+        }else {
+            hash.put(sCancellationCode, 1);
+        }
+    }
+
+    @Override        
+    protected void calcQuery() {
+        list = new ArrayList(hash.entrySet());
+        Collections.sort(list, (Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) -> e1.getValue().compareTo(e2.getValue()) //           @Override
+        );
+        
+        writeResult(QueryTemplate.fout);        
+    }
+
+    @Override        
+    protected void writeResult(FormattedOutput fout) {
+        String result = list.get(list.size()-1).getKey();
+        fout.addAnswer(2, result);
+    }
 }
 
 class Query3 extends Query3to8 {
