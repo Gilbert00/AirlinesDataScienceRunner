@@ -144,16 +144,17 @@ class Query1 extends QueryTemplate {
 class Query2 extends QueryTemplate {
     Map<String,Integer> hash = new HashMap<String,Integer>();
     List<Map.Entry<String,Integer>> list;
+    int indKey = BaseColumn.CancellationCode.ordinal();
     
     @Override    
     protected boolean clearRecord(String[] record) {
-        String sCancellationCode = record[BaseColumn.CancellationCode.ordinal()].trim();
+        String sCancellationCode = record[indKey].trim();
         return sCancellationCode.length() > 0;
     }
 
     @Override        
     protected void processingRecord(String[] record) {
-        String sCancellationCode = record[BaseColumn.CancellationCode.ordinal()].trim();
+        String sCancellationCode = record[indKey].trim();
         Integer val = hash.get(sCancellationCode);
         if (val!=null) {
             val++;
@@ -166,7 +167,9 @@ class Query2 extends QueryTemplate {
     @Override        
     protected void calcQuery() {
         list = new ArrayList(hash.entrySet());
-        Collections.sort(list, (Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) -> e1.getValue().compareTo(e2.getValue()) //           @Override
+        Collections.sort( list, 
+                          (Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) -> 
+                                e1.getValue().compareTo(e2.getValue() ) 
         );
         
         writeResult(QueryTemplate.fout);        
