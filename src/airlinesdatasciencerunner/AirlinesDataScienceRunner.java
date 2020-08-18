@@ -113,6 +113,16 @@ class QueryTemplate {
     protected void writeResult(FormattedOutput fout) {
 //TODO        
     }
+
+    protected void incrHashValue(Map<String,Integer> hash, String key, int d) {
+        Integer val = hash.get(key);
+        if (val!=null) {
+            val += d;
+            hash.put(key, val);
+        }else {
+            hash.put(key, d);
+        }
+    }
 }
 
 class QueryNoCanceled extends QueryTemplate {
@@ -243,20 +253,10 @@ class Query4 extends QueryNoCanceled {
     protected void processingRecord(String[] record) {
         String sOriginAirportID = record[indOriginAirportID].trim();
         String sDestAirportID = record[indDestAirportID].trim();
-        incrHashValue(sOriginAirportID);
-        incrHashValue(sDestAirportID);
+        incrHashValue(hash, sOriginAirportID, 1);
+        incrHashValue(hash, sDestAirportID, 1);
     }
 
-    private void incrHashValue(String key) {
-        Integer val = hash.get(key);
-        if (val!=null) {
-            val++;
-            hash.put(key, val);
-        }else {
-            hash.put(key, 1);
-        }
-    }
-    
     @Override        
     protected void calcQuery() {
         list = new ArrayList(hash.entrySet());
