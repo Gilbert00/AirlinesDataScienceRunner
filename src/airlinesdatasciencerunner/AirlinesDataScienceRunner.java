@@ -142,7 +142,7 @@ class Query1 extends QueryTemplate {
 }
 
 class Query2 extends QueryTemplate {
-    Map<String,Integer> hash = new HashMap<String,Integer>();
+    Map<String,Integer> hash = new HashMap<>();
     List<Map.Entry<String,Integer>> list;
     int indKey = BaseColumn.CancellationCode.ordinal();
     
@@ -227,9 +227,52 @@ class Query3 extends QueryNoCanceled {
 }
 
 class Query4 extends QueryNoCanceled {
-//    Query1(FormattedOutput fout) {
-//        super(fout);
-//    }
+    Map<String,Integer> hash = new HashMap<>();
+    List<Map.Entry<String,Integer>> list;
+    int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
+    int indDestAirportID = BaseColumn.DestAirportID.ordinal();
+    
+    @Override    
+    protected boolean clearRecord(String[] record) {
+        String sOriginAirportID = record[indOriginAirportID].trim();
+        String sDestAirportID = record[indDestAirportID].trim();
+        return sOriginAirportID.length() > 0 && sDestAirportID.length() > 0;
+    }
+
+    @Override        
+    protected void processingRecord(String[] record) {
+        String sOriginAirportID = record[indOriginAirportID].trim();
+        String sDestAirportID = record[indDestAirportID].trim();
+        incrHashValue(sOriginAirportID);
+        incrHashValue(sDestAirportID);
+    }
+
+    private void incrHashValue(String key) {
+        Integer val = hash.get(key);
+        if (val!=null) {
+            val++;
+            hash.put(key, val);
+        }else {
+            hash.put(key, 1);
+        }
+    }
+    
+    @Override        
+    protected void calcQuery() {
+        list = new ArrayList(hash.entrySet());
+        Collections.sort( list, 
+                          (Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) -> 
+                                e1.getValue().compareTo(e2.getValue() ) 
+        );
+        
+        writeResult(QueryTemplate.fout);        
+    }
+
+    @Override        
+    protected void writeResult(FormattedOutput fout) {
+        String result = list.get(list.size()-1).getKey();
+        fout.addAnswer(4, result);
+    }
 }
 
 class Query5 extends QueryNoCanceled {
