@@ -301,25 +301,25 @@ class AirlinesDataScience {
         fout = new FormattedOutput();
         QueryTemplate.setFOut(fout); 
         
-        Query1 q1 = new Query1(); 
-        Query2 q2 = new Query2(); 
-        Query3 q3 = new Query3(); 
-        Query4 q4 = new Query4(); 
-        Query5 q5 = new Query5(); 
-        Query6 q6 = new Query6(); 
-        Query7 q7 = new Query7(); 
-        Query8 q8 = new Query8(); 
-        Query9 q9 = new Query9();
+        new Query1().run(); 
+        new Query2().run();
+        new Query3().run(); 
+        new Query4().run(); 
+        new Query5().run(); 
+        new Query6().run(); 
+        new Query7().run(); 
+        new Query8().run(); 
+        new Query9().run();
 
-        q1.run(); 
-        q2.run(); 
-        q3.run(); 
-        q4.run(); 
-        q5.run(); 
-        q6.run(); 
-        q7.run(); 
-        q8.run(); 
-        q9.run(); 
+//        q1.run(); 
+//        q2.run(); 
+//        q3.run(); 
+//        q4.run(); 
+//        q5.run(); 
+//        q6.run(); 
+//        q7.run(); 
+//        q8.run(); 
+//        q9.run(); 
 
       outResult(fout);        
     }
