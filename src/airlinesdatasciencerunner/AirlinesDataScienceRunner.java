@@ -183,9 +183,47 @@ class Query2 extends QueryTemplate {
 }
 
 class Query3 extends Query3to8 {
-//    Query1(FormattedOutput fout) {
-//        super(fout);
-//    }
+    Map<String,Integer> hash = new HashMap<String,Integer>();
+    List<Map.Entry<String,Integer>> list;
+    int indTailNum = BaseColumn.TailNum.ordinal();
+    int indDistance = BaseColumn.Distance.ordinal();
+    
+    @Override    
+    protected boolean clearRecord(String[] record) {
+        String sTailNum = record[indTailNum].trim();
+        String sDistance = record[indDistance];
+        return sTailNum.length()>0 && isInt(sDistance);
+    }
+
+    @Override        
+    protected void processingRecord(String[] record) {
+        String sTailNum = record[indTailNum].trim();
+        int iDistance = new Integer(record[indDistance]);
+        Integer val = hash.get(sTailNum);
+        if (val!=null) {
+            val += iDistance;
+            hash.put(sTailNum, val);
+        }else {
+            hash.put(sTailNum, iDistance);
+        }
+    }
+
+    @Override        
+    protected void calcQuery() {
+        list = new ArrayList(hash.entrySet());
+        Collections.sort( list, 
+                          (Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) -> 
+                                e1.getValue().compareTo(e2.getValue() ) 
+        );
+        
+        writeResult(QueryTemplate.fout);        
+    }
+
+    @Override        
+    protected void writeResult(FormattedOutput fout) {
+        String result = list.get(list.size()-1).getKey();
+        fout.addAnswer(3, result);
+    }
 }
 
 class Query4 extends Query3to8 {
