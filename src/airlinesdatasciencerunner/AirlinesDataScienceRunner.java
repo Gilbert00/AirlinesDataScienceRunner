@@ -165,13 +165,7 @@ class Query2 extends QueryTemplate {
     @Override        
     protected void processingRecord(String[] record) {
         String sCancellationCode = record[indKey].trim();
-        Integer val = hash.get(sCancellationCode);
-        if (val!=null) {
-            val++;
-            hash.put(sCancellationCode, val);
-        }else {
-            hash.put(sCancellationCode, 1);
-        }
+        incrHashValue(hash, sCancellationCode, 1);
     }
 
     @Override        
@@ -209,13 +203,7 @@ class Query3 extends QueryNoCanceled {
     protected void processingRecord(String[] record) {
         String sTailNum = record[indTailNum].trim();
         int iDistance = new Integer(record[indDistance]);
-        Integer val = hash.get(sTailNum);
-        if (val!=null) {
-            val += iDistance;
-            hash.put(sTailNum, val);
-        }else {
-            hash.put(sTailNum, iDistance);
-        }
+        incrHashValue(hash, sTailNum, iDistance);
     }
 
     @Override        
