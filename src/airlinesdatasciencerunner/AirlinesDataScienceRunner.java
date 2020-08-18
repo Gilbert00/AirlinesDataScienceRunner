@@ -115,7 +115,7 @@ class QueryTemplate {
     }
 }
 
-class Query3to8 extends QueryTemplate {
+class QueryNoCanceled extends QueryTemplate {
     @Override    
     protected boolean canceledRecord(String[] record) {
         String sCanceled = record[BaseColumn.Cancelled.ordinal()];
@@ -126,7 +126,7 @@ class Query3to8 extends QueryTemplate {
     }
 }
 
-class Query7to8 extends Query3to8 {
+class QueryNoCanceledDiverted extends QueryNoCanceled {
     @Override    
     protected boolean divertedRecord(String[] record) {
         String sDiverted = record[BaseColumn.Diverted.ordinal()];
@@ -182,7 +182,7 @@ class Query2 extends QueryTemplate {
     }
 }
 
-class Query3 extends Query3to8 {
+class Query3 extends QueryNoCanceled {
     Map<String,Integer> hash = new HashMap<String,Integer>();
     List<Map.Entry<String,Integer>> list;
     int indTailNum = BaseColumn.TailNum.ordinal();
@@ -226,57 +226,43 @@ class Query3 extends Query3to8 {
     }
 }
 
-class Query4 extends Query3to8 {
+class Query4 extends QueryNoCanceled {
 //    Query1(FormattedOutput fout) {
 //        super(fout);
 //    }
 }
 
-class Query5 extends Query3to8 {
+class Query5 extends QueryNoCanceled {
 //    Query1(FormattedOutput fout) {
 //        super(fout);
 //    }
 }
 
-class Query6 extends Query3to8 {
+class Query6 extends QueryNoCanceled {
 //    Query1(FormattedOutput fout) {
 //        super(fout);
 //    }
 }
 
-class Query7 extends Query7to8 {
+class Query7 extends QueryNoCanceledDiverted {
     int result = 0;
 //    String sUniqueCarrier;
-//    int iDepDelay;
+    int indDepDelay = BaseColumn.DepDelay.ordinal();
 //    int iArrDelay
+    int indUniqueCarrier = BaseColumn.UniqueCarrier.ordinal();
 
     @Override    
     protected boolean clearRecord(String[] record) {
-        String sDepDelay = record[BaseColumn.DepDelay.ordinal()];
+        String sDepDelay = record[indDepDelay];
 //        String sArrDelay = record[BaseColumn.ArrDelay.ordinal()];
         return isInt(sDepDelay); // && isInt(sArrDelay);
     }
     
-//    @Override    
-//    protected boolean canceledRecord(String[] record) {
-//        String sCanceled = record[BaseColumn.Cancelled.ordinal()];
-//        String sCancelCode = record[BaseColumn.CancellationCode.ordinal()].trim();
-//        boolean b = (isInt(sCanceled) && (new Integer(sCanceled))==1) || 
-//                    sCancelCode.length()>0;
-//        return b;
-//    }
-//    
-//    @Override    
-//    protected boolean divertedRecord(String[] record) {
-//        String sDiverted = record[BaseColumn.Diverted.ordinal()];
-//        return isInt(sDiverted) && (new Integer(sDiverted))==1;
-//    }
-    
     @Override    
     protected void processingRecord(String[] record) {
-        String sUniqueCarrier = record[BaseColumn.UniqueCarrier.ordinal()].trim();
+        String sUniqueCarrier = record[indUniqueCarrier].trim();
         if (sUniqueCarrier.equals("AA")){
-           int iDepDelay = new Integer(record[BaseColumn.DepDelay.ordinal()]);
+           int iDepDelay = new Integer(record[indDepDelay]);
 //           int iArrDelay = new Integer(record[BaseColumn.ArrDelay.ordinal()]);
            
            if (iDepDelay>=60) {
@@ -291,29 +277,34 @@ class Query7 extends Query7to8 {
     }
 }
 
-class Query8 extends Query7to8 {
+class Query8 extends QueryNoCanceledDiverted {
     int mDayOfMonth = 0;
     int mDepDelay = 0;
     String mTailNum = "";
     
+    int indDepDelay = BaseColumn.DepDelay.ordinal();
+    int indArrDelay = BaseColumn.ArrDelay.ordinal();       
+    int indDayOfMonth = BaseColumn.DayofMonth.ordinal();       
+    int indTailNum = BaseColumn.TailNum.ordinal();       
+    
     @Override    
     protected boolean clearRecord(String[] record) {
-        String sDepDelay = record[BaseColumn.DepDelay.ordinal()];
-        String sDayOfMonth = record[BaseColumn.DayofMonth.ordinal()];
-        String sTailNum  = record[BaseColumn.TailNum.ordinal()].trim();       
-        String sArrDelay = record[BaseColumn.ArrDelay.ordinal()];
+        String sDepDelay = record[indDepDelay];
+        String sDayOfMonth = record[indDayOfMonth];
+        String sTailNum  = record[indTailNum].trim();       
+        String sArrDelay = record[indArrDelay];
         return isInt(sDepDelay) && isInt(sDayOfMonth) && isInt(sArrDelay) && sTailNum.length()>0;
     }
 
     @Override        
     protected void processingRecord(String[] record) {
-        int iArrDelay = new Integer(record[BaseColumn.ArrDelay.ordinal()]);
+        int iArrDelay = new Integer(record[indArrDelay]);
         if (iArrDelay<=0) {
-            int iDepDelay = new Integer(record[BaseColumn.DepDelay.ordinal()]);
+            int iDepDelay = new Integer(record[indDepDelay]);
             if (iDepDelay > mDepDelay) {
                 mDepDelay = iDepDelay;
-                mDayOfMonth = new Integer(record[BaseColumn.DayofMonth.ordinal()]);
-                mTailNum = record[BaseColumn.TailNum.ordinal()].trim();       
+                mDayOfMonth = new Integer(record[indDayOfMonth]);
+                mTailNum = record[indTailNum].trim();       
             }
         }
     }
