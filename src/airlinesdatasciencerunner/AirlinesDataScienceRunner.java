@@ -264,15 +264,81 @@ class Query4 extends QueryNoCanceled {
 }
 
 class Query5 extends QueryNoCanceled {
-//    Query1(FormattedOutput fout) {
-//        super(fout);
-//    }
+    Map<String,Integer> hash = new HashMap<>();
+    List<Map.Entry<String,Integer>> list;
+    int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
+    int indDestAirportID = BaseColumn.DestAirportID.ordinal();
+    
+    @Override    
+    protected boolean clearRecord(String[] record) {
+        String sOriginAirportID = record[indOriginAirportID].trim();
+        String sDestAirportID = record[indDestAirportID].trim();
+        return sOriginAirportID.length() > 0 && sDestAirportID.length() > 0;
+    }
+
+    @Override        
+    protected void processingRecord(String[] record) {
+        String sOriginAirportID = record[indOriginAirportID].trim();
+        String sDestAirportID = record[indDestAirportID].trim();
+        incrHashValue(hash, sOriginAirportID, 1);
+        incrHashValue(hash, sDestAirportID, -1);
+    }
+
+    @Override        
+    protected void calcQuery() {
+        list = new ArrayList(hash.entrySet());
+        Collections.sort( list, 
+                          (Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) -> 
+                                e1.getValue().compareTo(e2.getValue() ) 
+        );
+        
+        writeResult(QueryTemplate.fout);        
+    }
+
+    @Override        
+    protected void writeResult(FormattedOutput fout) {
+        String result = list.get(list.size()-1).getKey();
+        fout.addAnswer(5, result);
+    }
 }
 
 class Query6 extends QueryNoCanceled {
-//    Query1(FormattedOutput fout) {
-//        super(fout);
-//    }
+    Map<String,Integer> hash = new HashMap<>();
+    List<Map.Entry<String,Integer>> list;
+    int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
+    int indDestAirportID = BaseColumn.DestAirportID.ordinal();
+    
+    @Override    
+    protected boolean clearRecord(String[] record) {
+        String sOriginAirportID = record[indOriginAirportID].trim();
+        String sDestAirportID = record[indDestAirportID].trim();
+        return sOriginAirportID.length() > 0 && sDestAirportID.length() > 0;
+    }
+
+    @Override        
+    protected void processingRecord(String[] record) {
+        String sOriginAirportID = record[indOriginAirportID].trim();
+        String sDestAirportID = record[indDestAirportID].trim();
+        incrHashValue(hash, sOriginAirportID, -1);
+        incrHashValue(hash, sDestAirportID, 1);
+    }
+
+    @Override        
+    protected void calcQuery() {
+        list = new ArrayList(hash.entrySet());
+        Collections.sort( list, 
+                          (Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) -> 
+                                e1.getValue().compareTo(e2.getValue() ) 
+        );
+        
+        writeResult(QueryTemplate.fout);        
+    }
+
+    @Override        
+    protected void writeResult(FormattedOutput fout) {
+        String result = list.get(list.size()-1).getKey();
+        fout.addAnswer(6, result);
+    }
 }
 
 class Query7 extends QueryNoCanceledDiverted {
