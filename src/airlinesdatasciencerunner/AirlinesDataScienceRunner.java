@@ -475,10 +475,43 @@ class Query8 extends QueryNoCanceledDiverted {
     }
 }
 
-class Query9 extends QueryTemplate {
-//    Query1(FormattedOutput fout) {
-//        super(fout);
-//    }
+/**
+ * Вычисляет среднюю скорость по всем рейсам
+ * 
+ * @author Kemper
+ */
+class Query9 extends QueryNoCanceled {
+    int indAirTime = BaseColumn.AirTime.ordinal();
+    int indDistance = BaseColumn.Distance.ordinal();
+    int sumAirTime = 0;
+    int sumDistance  = 0;
+    
+    @Override        
+    protected boolean clearRecord(String[] record) {
+        String sAirTime = record[indAirTime];
+        String sDistance = record[indDistance];
+        return isInt(sAirTime) && isInt(sDistance);
+    }
+    
+    @Override        
+    protected void processingRecord(String[] record) {
+        sumAirTime += new Integer(record[indAirTime]);
+        sumDistance += new Integer(record[indDistance]);
+    }
+    
+    @Override        
+    protected void calcQuery() {
+        writeResult(QueryTemplate.fout);        
+    }
+    
+    @Override        
+    protected void writeResult(FormattedOutput fout) {
+//TODO  
+        float v = (float)60.0 * sumDistance / sumAirTime;
+        String result = String.format(Locale.US,"Average speed is %f km/hour", v);
+        fout.addAnswer(9, result);
+    }
+    
 }
 
 class AirlinesDataScience {
@@ -499,17 +532,7 @@ class AirlinesDataScience {
         new Query8().run(); 
         new Query9().run();
 
-//        q1.run(); 
-//        q2.run(); 
-//        q3.run(); 
-//        q4.run(); 
-//        q5.run(); 
-//        q6.run(); 
-//        q7.run(); 
-//        q8.run(); 
-//        q9.run(); 
-
-      outResult(fout);        
+        outResult(fout);        
     }
      
     void outResult(FormattedOutput fout){

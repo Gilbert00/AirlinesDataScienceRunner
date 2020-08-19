@@ -6,4 +6,4 @@ N789AA
 13232
 6
 10,27,N7843A
-No answer given
+Average speed is 443.310944 km/hour
