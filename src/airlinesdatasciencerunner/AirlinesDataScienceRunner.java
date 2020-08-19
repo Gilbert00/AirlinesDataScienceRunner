@@ -188,31 +188,17 @@ class Query1 extends QueryTemplate {
 
     @Override        
     protected void calcQuery() {
-//        for (Map.Entry<String,HashVal> iter: hash.entrySet()) {
-//            String key = iter.getKey();
-//            HashVal val = iter.getValue();
-//            val.proc = (float)100.0 * val.cancelled / val.count;
-//            hash.put(key, val);
-//        }
         hash.forEach((k,v)-> v.proc = (float)100.0 * v.cancelled / v.count);
         
-        Comparator<Map.Entry<String,HashVal>> comparator = new Comparator<Map.Entry<String,HashVal>>()
-                {
-                    @Override
-                    public int compare(Map.Entry<String, HashVal> e1, Map.Entry<String, HashVal> e2) {
-                        Float v1 = e1.getValue().proc;
-                        Float v2 = e2.getValue().proc;
-                        return v1.compareTo(v2);
-                    } 
-                    
-                };                
-        
         list = new ArrayList<Map.Entry<String,HashVal>>(hash.entrySet());
-        Collections.sort(list, comparator);
-//        Collections.sort(list, 
-//                          (Map.Entry<String, HashVal> e1, Map.Entry<String, HashVal> e2) -> 
-//                          {return e1.getValue().proc - e2.getValue().proc;} 
-//        ) ;
+
+        Collections.sort(list, 
+                         (Map.Entry<String, HashVal> e1, Map.Entry<String, HashVal> e2) -> {
+                            Float v1 = e1.getValue().proc;
+                            Float v2 = e2.getValue().proc;
+                            return v1.compareTo(v2);
+                         } 
+        ) ;
         
         writeResult(QueryTemplate.fout);        
     }
