@@ -72,7 +72,10 @@ class QueryTemplate {
 // int buffer = 16384 * 16384;   1048576     
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_FILE))) {
             String line = "";
+            int count = 0;
             while ((line = br.readLine()) != null) {
+                count++;
+                if (count == 1) {continue;};
                 values = line.split(COMMA_DELIMITER);
 //                records.add(Arrays.asList(values));
                 if ( clearRecord(values) && ! canceledRecord(values) && ! divertedRecord(values) ) {
@@ -146,9 +149,82 @@ class QueryNoCanceledDiverted extends QueryNoCanceled {
 
 
 class Query1 extends QueryTemplate {
-//    Query1(FormattedOutput fout) {
-//        super(fout);
-//    }
+    class HashVal {
+        int count;
+        int cancelled;
+        float proc; //Float!
+    }
+
+    Map<String,HashVal> hash = new HashMap<>();
+    List<Map.Entry<String,HashVal>> list;
+    int indCancelled = BaseColumn.Cancelled.ordinal();
+    int indUniqueCarrier = BaseColumn.UniqueCarrier.ordinal();
+    
+    
+    @Override    
+    protected boolean clearRecord(String[] record) {
+        String sUniqueCarrier = record[indUniqueCarrier].trim();
+        return sUniqueCarrier.length() > 0; 
+    }
+
+    @Override        
+    protected void processingRecord(String[] record) {
+        String key = record[indUniqueCarrier].trim();
+        String sCancelled = record[indCancelled];
+        boolean isCancelled = (isInt(sCancelled) && (new Integer(sCancelled))>0);
+        
+        HashVal val = hash.get(key);
+        if (val!=null) {
+            val.count++;
+            val.cancelled += isCancelled ? 1 : 0;
+        }else {
+            val = new HashVal();
+            val.count = 1;
+            val.cancelled = isCancelled ? 1 : 0;
+            val.proc = 0;
+        }
+        hash.put(key, val);
+    }
+
+    @Override        
+    protected void calcQuery() {
+//        for (Map.Entry<String,HashVal> iter: hash.entrySet()) {
+//            String key = iter.getKey();
+//            HashVal val = iter.getValue();
+//            val.proc = (float)100.0 * val.cancelled / val.count;
+//            hash.put(key, val);
+//        }
+        hash.forEach((k,v)-> v.proc = (float)100.0 * v.cancelled / v.count);
+        
+        Comparator<Map.Entry<String,HashVal>> comparator = new Comparator<Map.Entry<String,HashVal>>()
+                {
+                    @Override
+                    public int compare(Map.Entry<String, HashVal> e1, Map.Entry<String, HashVal> e2) {
+                        Float v1 = e1.getValue().proc;
+                        Float v2 = e2.getValue().proc;
+                        return v1.compareTo(v2);
+                    } 
+                    
+                };                
+        
+        list = new ArrayList<Map.Entry<String,HashVal>>(hash.entrySet());
+        Collections.sort(list, comparator);
+//        Collections.sort(list, 
+//                          (Map.Entry<String, HashVal> e1, Map.Entry<String, HashVal> e2) -> 
+//                          {return e1.getValue().proc - e2.getValue().proc;} 
+//        ) ;
+        
+        writeResult(QueryTemplate.fout);        
+    }
+
+    @Override        
+    protected void writeResult(FormattedOutput fout) {
+        int indMax = list.size()-1;
+        String key = list.get(indMax).getKey();
+        float proc = list.get(indMax).getValue().proc;
+        String result = String.format(Locale.US,"%s,%f", key, proc);
+        fout.addAnswer(1, result);
+    }
 }
 
 class Query2 extends QueryTemplate {
