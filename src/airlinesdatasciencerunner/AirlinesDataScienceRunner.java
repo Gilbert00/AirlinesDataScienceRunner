@@ -47,7 +47,8 @@ enum BaseColumn {
 class QueryTemplate {
 
     protected static final String COMMA_DELIMITER = ",";
-    protected static final String CSV_FILE = "Q:\\Java-School\\Project_2_DSWA\\flights_small.csv"; 
+//    protected static final String CSV_FILE = "Q:\\Java-School\\Project_2_DSWA\\flights_small.csv"; 
+    protected static final String CSV_FILE = "Q:\\Java-School\\Project_2_DSWA\\flights.csv"; 
     protected static FormattedOutput fout;
     
     static void setFOut(FormattedOutput fout){
@@ -190,7 +191,7 @@ class Query1 extends QueryTemplate {
     protected void calcQuery() {
         hash.forEach((k,v)-> v.proc = (float)100.0 * v.cancelled / v.count);
         
-        list = new ArrayList<Map.Entry<String,HashVal>>(hash.entrySet());
+        list = new ArrayList<>(hash.entrySet());
 
         Collections.sort(list, 
                          (Map.Entry<String, HashVal> e1, Map.Entry<String, HashVal> e2) -> {
