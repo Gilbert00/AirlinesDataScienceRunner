@@ -79,7 +79,7 @@ class QueryTemplate {
                 if (count == 1) {continue;};
                 values = line.split(COMMA_DELIMITER);
 //                records.add(Arrays.asList(values));
-                if ( filteredRecord(values) && ! canceledRecord(values) && ! divertedRecord(values) ) {
+                if ( filteredRecord (values) && ! canceledRecord(values) && ! divertedRecord(values) ) {
                     processingRecord(values);
                 }
             }
