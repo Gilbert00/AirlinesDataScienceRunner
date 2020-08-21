@@ -73,13 +73,13 @@ class QueryTemplate {
 // int buffer = 16384 * 16384;   1048576     
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_FILE))) {
             String line = "";
-            int count = 0;
+            long count = 0;
             while ((line = br.readLine()) != null) {
                 count++;
                 if (count == 1) {continue;};
                 values = line.split(COMMA_DELIMITER);
 //                records.add(Arrays.asList(values));
-                if ( clearRecord(values) && ! canceledRecord(values) && ! divertedRecord(values) ) {
+                if ( filteredRecord(values) && ! canceledRecord(values) && ! divertedRecord(values) ) {
                     processingRecord(values);
                 }
             }
@@ -90,7 +90,7 @@ class QueryTemplate {
         calcQuery();
     }
     
-    protected boolean clearRecord(String[] record) {
+    protected boolean filteredRecord(String[] record) {
 //TODO        
         return true;
     }
@@ -163,7 +163,7 @@ class Query1 extends QueryTemplate {
     
     
     @Override    
-    protected boolean clearRecord(String[] record) {
+    protected boolean filteredRecord(String[] record) {
         String sUniqueCarrier = record[indUniqueCarrier].trim();
         return sUniqueCarrier.length() > 0; 
     }
@@ -220,7 +220,7 @@ class Query2 extends QueryTemplate {
     int indKey = BaseColumn.CancellationCode.ordinal();
     
     @Override    
-    protected boolean clearRecord(String[] record) {
+    protected boolean filteredRecord(String[] record) {
         String sCancellationCode = record[indKey].trim();
         return sCancellationCode.length() > 0;
     }
@@ -256,7 +256,7 @@ class Query3 extends QueryNoCanceled {
     int indDistance = BaseColumn.Distance.ordinal();
     
     @Override    
-    protected boolean clearRecord(String[] record) {
+    protected boolean filteredRecord(String[] record) {
         String sTailNum = record[indTailNum].trim();
         String sDistance = record[indDistance];
         return sTailNum.length()>0 && isInt(sDistance);
@@ -294,7 +294,7 @@ class Query4 extends QueryNoCanceled {
     int indDestAirportID = BaseColumn.DestAirportID.ordinal();
     
     @Override    
-    protected boolean clearRecord(String[] record) {
+    protected boolean filteredRecord(String[] record) {
         String sOriginAirportID = record[indOriginAirportID].trim();
         String sDestAirportID = record[indDestAirportID].trim();
         return sOriginAirportID.length() > 0 && sDestAirportID.length() > 0;
@@ -333,7 +333,7 @@ class Query5 extends QueryNoCanceled {
     int indDestAirportID = BaseColumn.DestAirportID.ordinal();
     
     @Override    
-    protected boolean clearRecord(String[] record) {
+    protected boolean filteredRecord(String[] record) {
         String sOriginAirportID = record[indOriginAirportID].trim();
         String sDestAirportID = record[indDestAirportID].trim();
         return sOriginAirportID.length() > 0 && sDestAirportID.length() > 0;
@@ -372,7 +372,7 @@ class Query6 extends QueryNoCanceled {
     int indDestAirportID = BaseColumn.DestAirportID.ordinal();
     
     @Override    
-    protected boolean clearRecord(String[] record) {
+    protected boolean filteredRecord(String[] record) {
         String sOriginAirportID = record[indOriginAirportID].trim();
         String sDestAirportID = record[indDestAirportID].trim();
         return sOriginAirportID.length() > 0 && sDestAirportID.length() > 0;
@@ -406,16 +406,13 @@ class Query6 extends QueryNoCanceled {
 
 class Query7 extends QueryNoCanceledDiverted {
     int result = 0;
-//    String sUniqueCarrier;
     int indDepDelay = BaseColumn.DepDelay.ordinal();
-//    int iArrDelay
     int indUniqueCarrier = BaseColumn.UniqueCarrier.ordinal();
 
     @Override    
-    protected boolean clearRecord(String[] record) {
+    protected boolean filteredRecord(String[] record) {
         String sDepDelay = record[indDepDelay];
-//        String sArrDelay = record[BaseColumn.ArrDelay.ordinal()];
-        return isInt(sDepDelay); // && isInt(sArrDelay);
+        return isInt(sDepDelay); 
     }
     
     @Override    
@@ -423,7 +420,6 @@ class Query7 extends QueryNoCanceledDiverted {
         String sUniqueCarrier = record[indUniqueCarrier].trim();
         if (sUniqueCarrier.equals("AA")){
            int iDepDelay = new Integer(record[indDepDelay]);
-//           int iArrDelay = new Integer(record[BaseColumn.ArrDelay.ordinal()]);
            
            if (iDepDelay>=60) {
                result++;
@@ -448,7 +444,7 @@ class Query8 extends QueryNoCanceledDiverted {
     int indTailNum = BaseColumn.TailNum.ordinal();       
     
     @Override    
-    protected boolean clearRecord(String[] record) {
+    protected boolean filteredRecord(String[] record) {
         String sDepDelay = record[indDepDelay];
         String sDayOfMonth = record[indDayOfMonth];
         String sTailNum  = record[indTailNum].trim();       
@@ -488,10 +484,11 @@ class Query9 extends QueryNoCanceled {
     int sumDistance  = 0;
     
     @Override        
-    protected boolean clearRecord(String[] record) {
+    protected boolean filteredRecord(String[] record) {
         String sAirTime = record[indAirTime];
         String sDistance = record[indDistance];
-        return isInt(sAirTime) && isInt(sDistance);
+        return isInt(sAirTime) && isInt(sDistance) && 
+               (new Integer(sAirTime))>0 && (new Integer(sDistance))>0;
     }
     
     @Override        
