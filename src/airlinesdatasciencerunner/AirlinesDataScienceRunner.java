@@ -407,6 +407,7 @@ class Query6 extends QueryNoCanceled {
 class Query7 extends QueryNoCanceledDiverted {
     int result = 0;
     int indDepDelay = BaseColumn.DepDelay.ordinal();
+    int indArrDelay = BaseColumn.ArrDelay.ordinal();
     int indUniqueCarrier = BaseColumn.UniqueCarrier.ordinal();
 
     @Override    
@@ -420,8 +421,9 @@ class Query7 extends QueryNoCanceledDiverted {
         String sUniqueCarrier = record[indUniqueCarrier].trim();
         if (sUniqueCarrier.equals("AA")){
            int iDepDelay = new Integer(record[indDepDelay]);
+           int iArrDelay = new Integer(record[indArrDelay]);
            
-           if (iDepDelay>=60) {
+           if (iDepDelay>=60 || iArrDelay>=60) {
                result++;
            }
         }
