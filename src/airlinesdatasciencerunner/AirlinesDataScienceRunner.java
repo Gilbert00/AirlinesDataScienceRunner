@@ -153,7 +153,7 @@ class Query1 extends QueryTemplate {
     class HashVal {
         int count;
         int cancelled;
-        float proc; //Float!
+        double proc; 
     }
 
     Map<String,HashVal> hash = new HashMap<>();
@@ -189,14 +189,14 @@ class Query1 extends QueryTemplate {
 
     @Override        
     protected void calcQuery() {
-        hash.forEach((k,v)-> v.proc = (float)100.0 * v.cancelled / v.count);
+        hash.forEach((k,v)-> v.proc = (double)100.0 * v.cancelled / v.count);
         
         list = new ArrayList<>(hash.entrySet());
 
         Collections.sort(list, 
                          (Map.Entry<String, HashVal> e1, Map.Entry<String, HashVal> e2) -> {
-                            Float v1 = e1.getValue().proc;
-                            Float v2 = e2.getValue().proc;
+                            Double v1 = e1.getValue().proc;
+                            Double v2 = e2.getValue().proc;
                             return v1.compareTo(v2);
                          } 
         ) ;
@@ -208,8 +208,8 @@ class Query1 extends QueryTemplate {
     protected void writeResult(FormattedOutput fout) {
         int indMax = list.size()-1;
         String key = list.get(indMax).getKey();
-        float proc = list.get(indMax).getValue().proc;
-        String result = String.format(Locale.US,"%s,%f", key, proc);
+        double proc = list.get(indMax).getValue().proc;
+        String result = String.format(Locale.US,"%s,%-20.16f", key, proc);
         fout.addAnswer(1, result);
     }
 }
