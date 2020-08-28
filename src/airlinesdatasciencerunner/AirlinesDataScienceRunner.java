@@ -164,6 +164,9 @@ class Query1 extends QueryTemplate {
     
     @Override    
     protected boolean filteredRecord(String[] record) {
+        String sDiverted = record[BaseColumn.Diverted.ordinal()];
+        if (isInt(sDiverted) && (new Integer(sDiverted))==1) return false;
+
         String sUniqueCarrier = record[indUniqueCarrier].trim();
         return sUniqueCarrier.length() > 0; 
     }
@@ -209,7 +212,7 @@ class Query1 extends QueryTemplate {
         int indMax = list.size()-1;
         String key = list.get(indMax).getKey();
         double proc = list.get(indMax).getValue().proc;
-        String result = String.format(Locale.US,"%s,%-20.16f", key, proc);
+        String result = String.format(Locale.US,"%s,%-20.10f", key, proc);
         fout.addAnswer(1, result);
     }
 }
