@@ -3,8 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+/**
+ * @author Kemper F.M. 
+ * @version 0.9.7
+ */
 package airlinesdatasciencerunner;
 
+import static airlinesdatasciencerunner.QueryTemplate.isInt;
 import java.io.*;
 import java.util.*; 
 
@@ -44,7 +49,24 @@ enum BaseColumn {
    ColumnType getType(){ return type; }
 }
 
-class QueryTemplate {
+interface IfCanceled {
+    default boolean canceledRecord(String[] record) {
+        String sCanceled = record[BaseColumn.Cancelled.ordinal()];
+        String sCancelCode = record[BaseColumn.CancellationCode.ordinal()].trim();
+        boolean b = (isInt(sCanceled) && (new Integer(sCanceled))==1) || 
+                    sCancelCode.length()>0;
+        return b;
+    }
+}
+
+interface IfDiverted {
+    default boolean divertedRecord(String[] record) {
+        String sDiverted = record[BaseColumn.Diverted.ordinal()];
+        return isInt(sDiverted) && (new Integer(sDiverted))==1;
+    }
+}
+
+class QueryTemplate implements IfCanceled, IfDiverted{
 
     protected static final String COMMA_DELIMITER = ",";
 //    protected static final String CSV_FILE = "Q:\\Java-School\\Project_2_DSWA\\flights_small.csv"; 
@@ -95,13 +117,13 @@ class QueryTemplate {
         return true;
     }
     
-    protected boolean canceledRecord(String[] record) {
-//TODO        
+    @Override    
+    public boolean canceledRecord(String[] record) {
         return false;
     }
     
-    protected boolean divertedRecord(String[] record) {
-//TODO        
+    @Override    
+    public boolean divertedRecord(String[] record) {
         return false;
     }
     
@@ -129,27 +151,27 @@ class QueryTemplate {
     }
 }
 
-class QueryNoCanceled extends QueryTemplate {
-    @Override    
-    protected boolean canceledRecord(String[] record) {
-        String sCanceled = record[BaseColumn.Cancelled.ordinal()];
-        String sCancelCode = record[BaseColumn.CancellationCode.ordinal()].trim();
-        boolean b = (isInt(sCanceled) && (new Integer(sCanceled))==1) || 
-                    sCancelCode.length()>0;
-        return b;
-    }
-}
+//class QueryNoCanceled extends QueryTemplate {
+//    @Override    
+//    protected boolean canceledRecord(String[] record) {
+//        String sCanceled = record[BaseColumn.Cancelled.ordinal()];
+//        String sCancelCode = record[BaseColumn.CancellationCode.ordinal()].trim();
+//        boolean b = (isInt(sCanceled) && (new Integer(sCanceled))==1) || 
+//                    sCancelCode.length()>0;
+//        return b;
+//    }
+//}
+//
+//class QueryNoCanceledDiverted extends QueryNoCanceled {
+//    @Override    
+//    protected boolean divertedRecord(String[] record) {
+//        String sDiverted = record[BaseColumn.Diverted.ordinal()];
+//        return isInt(sDiverted) && (new Integer(sDiverted))==1;
+//    }
+//}
 
-class QueryNoCanceledDiverted extends QueryNoCanceled {
-    @Override    
-    protected boolean divertedRecord(String[] record) {
-        String sDiverted = record[BaseColumn.Diverted.ordinal()];
-        return isInt(sDiverted) && (new Integer(sDiverted))==1;
-    }
-}
 
-
-class Query1 extends QueryTemplate {
+class Query1 extends QueryTemplate implements IfCanceled, IfDiverted {
     class HashVal {
         int count;
         int cancelled;
@@ -216,7 +238,7 @@ class Query1 extends QueryTemplate {
     }
 }
 
-class Query2 extends QueryTemplate {
+class Query2 extends QueryTemplate  implements IfCanceled, IfDiverted {
     Map<String,Integer> hash = new HashMap<>();
     List<Map.Entry<String,Integer>> list;
     static final int indKey = BaseColumn.CancellationCode.ordinal();
@@ -251,7 +273,7 @@ class Query2 extends QueryTemplate {
     }
 }
 
-class Query3 extends QueryNoCanceled {
+class Query3 extends QueryTemplate implements IfCanceled {
     Map<String,Integer> hash = new HashMap<String,Integer>();
     List<Map.Entry<String,Integer>> list;
     static final int indTailNum = BaseColumn.TailNum.ordinal();
@@ -289,7 +311,7 @@ class Query3 extends QueryNoCanceled {
     }
 }
 
-class Query4 extends QueryNoCanceled {
+class Query4 extends QueryTemplate implements IfCanceled {
     Map<String,Integer> hash = new HashMap<>();
     List<Map.Entry<String,Integer>> list;
     static final int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
@@ -328,7 +350,7 @@ class Query4 extends QueryNoCanceled {
     }
 }
 
-class Query5 extends QueryNoCanceled {
+class Query5 extends QueryTemplate implements IfCanceled {
     Map<String,Integer> hash = new HashMap<>();
     List<Map.Entry<String,Integer>> list;
     static final int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
@@ -367,7 +389,7 @@ class Query5 extends QueryNoCanceled {
     }
 }
 
-class Query6 extends QueryNoCanceled {
+class Query6 extends QueryTemplate implements IfCanceled {
     Map<String,Integer> hash = new HashMap<>();
     List<Map.Entry<String,Integer>> list;
     static final int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
@@ -406,7 +428,7 @@ class Query6 extends QueryNoCanceled {
     }
 }
 
-class Query7 extends QueryNoCanceledDiverted {
+class Query7 extends QueryTemplate implements IfCanceled, IfDiverted {
     int result = 0;
     static final int indDepDelay = BaseColumn.DepDelay.ordinal();
     static final int indArrDelay = BaseColumn.ArrDelay.ordinal();
@@ -437,7 +459,7 @@ class Query7 extends QueryNoCanceledDiverted {
     }
 }
 
-class Query8 extends QueryNoCanceledDiverted {
+class Query8 extends QueryTemplate implements IfCanceled, IfDiverted {
     int mDayOfMonth = 0;
     int mDepDelay = 0;
     String mTailNum = "";
@@ -481,7 +503,7 @@ class Query8 extends QueryNoCanceledDiverted {
  * 
  * @author Kemper
  */
-class Query9 extends QueryNoCanceled {
+class Query9 extends QueryTemplate implements IfCanceled {
     static final int indAirTime = BaseColumn.AirTime.ordinal();
     static final int indDistance = BaseColumn.Distance.ordinal();
     int sumAirTime = 0;
