@@ -5,7 +5,7 @@
  */
 /**
  * @author Kemper F.M. 
- * @version 0.9.8
+ * @version 0.9.9
  */
 package airlinesdatasciencerunner;
 
@@ -503,11 +503,6 @@ class Query9 extends QueryTemplate implements InterfaceCanceled {
     protected void processingRecord(String[] record) {
         sumAirTime += new Integer(record[indAirTime]);
         sumDistance += new Integer(record[indDistance]);
-    }
-    
-    @Override        
-    protected void calcQuery() {
-        writeResult(QueryTemplate.fout);        
     }
     
     @Override        
