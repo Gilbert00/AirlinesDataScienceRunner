@@ -158,9 +158,8 @@ class Query1 extends QueryTemplate {
 
     Map<String,HashVal> hash = new HashMap<>();
     List<Map.Entry<String,HashVal>> list;
-    int indCancelled = BaseColumn.Cancelled.ordinal();
-    int indUniqueCarrier = BaseColumn.UniqueCarrier.ordinal();
-    
+    static final int indCancelled = BaseColumn.Cancelled.ordinal();
+    static final int indUniqueCarrier = BaseColumn.UniqueCarrier.ordinal();
     
     @Override    
     protected boolean filteredRecord(String[] record) {
@@ -220,7 +219,7 @@ class Query1 extends QueryTemplate {
 class Query2 extends QueryTemplate {
     Map<String,Integer> hash = new HashMap<>();
     List<Map.Entry<String,Integer>> list;
-    int indKey = BaseColumn.CancellationCode.ordinal();
+    static final int indKey = BaseColumn.CancellationCode.ordinal();
     
     @Override    
     protected boolean filteredRecord(String[] record) {
@@ -255,8 +254,8 @@ class Query2 extends QueryTemplate {
 class Query3 extends QueryNoCanceled {
     Map<String,Integer> hash = new HashMap<String,Integer>();
     List<Map.Entry<String,Integer>> list;
-    int indTailNum = BaseColumn.TailNum.ordinal();
-    int indDistance = BaseColumn.Distance.ordinal();
+    static final int indTailNum = BaseColumn.TailNum.ordinal();
+    static final int indDistance = BaseColumn.Distance.ordinal();
     
     @Override    
     protected boolean filteredRecord(String[] record) {
@@ -293,8 +292,8 @@ class Query3 extends QueryNoCanceled {
 class Query4 extends QueryNoCanceled {
     Map<String,Integer> hash = new HashMap<>();
     List<Map.Entry<String,Integer>> list;
-    int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
-    int indDestAirportID = BaseColumn.DestAirportID.ordinal();
+    static final int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
+    static final int indDestAirportID = BaseColumn.DestAirportID.ordinal();
     
     @Override    
     protected boolean filteredRecord(String[] record) {
@@ -332,8 +331,8 @@ class Query4 extends QueryNoCanceled {
 class Query5 extends QueryNoCanceled {
     Map<String,Integer> hash = new HashMap<>();
     List<Map.Entry<String,Integer>> list;
-    int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
-    int indDestAirportID = BaseColumn.DestAirportID.ordinal();
+    static final int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
+    static final int indDestAirportID = BaseColumn.DestAirportID.ordinal();
     
     @Override    
     protected boolean filteredRecord(String[] record) {
@@ -371,8 +370,8 @@ class Query5 extends QueryNoCanceled {
 class Query6 extends QueryNoCanceled {
     Map<String,Integer> hash = new HashMap<>();
     List<Map.Entry<String,Integer>> list;
-    int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
-    int indDestAirportID = BaseColumn.DestAirportID.ordinal();
+    static final int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
+    static final int indDestAirportID = BaseColumn.DestAirportID.ordinal();
     
     @Override    
     protected boolean filteredRecord(String[] record) {
@@ -409,9 +408,9 @@ class Query6 extends QueryNoCanceled {
 
 class Query7 extends QueryNoCanceledDiverted {
     int result = 0;
-    int indDepDelay = BaseColumn.DepDelay.ordinal();
-    int indArrDelay = BaseColumn.ArrDelay.ordinal();
-    int indUniqueCarrier = BaseColumn.UniqueCarrier.ordinal();
+    static final int indDepDelay = BaseColumn.DepDelay.ordinal();
+    static final int indArrDelay = BaseColumn.ArrDelay.ordinal();
+    static final int indUniqueCarrier = BaseColumn.UniqueCarrier.ordinal();
 
     @Override    
     protected boolean filteredRecord(String[] record) {
@@ -443,10 +442,10 @@ class Query8 extends QueryNoCanceledDiverted {
     int mDepDelay = 0;
     String mTailNum = "";
     
-    int indDepDelay = BaseColumn.DepDelay.ordinal();
-    int indArrDelay = BaseColumn.ArrDelay.ordinal();       
-    int indDayOfMonth = BaseColumn.DayofMonth.ordinal();       
-    int indTailNum = BaseColumn.TailNum.ordinal();       
+    static final int indDepDelay = BaseColumn.DepDelay.ordinal();
+    static final int indArrDelay = BaseColumn.ArrDelay.ordinal();       
+    static final int indDayOfMonth = BaseColumn.DayofMonth.ordinal();       
+    static final int indTailNum = BaseColumn.TailNum.ordinal();       
     
     @Override    
     protected boolean filteredRecord(String[] record) {
@@ -483,8 +482,8 @@ class Query8 extends QueryNoCanceledDiverted {
  * @author Kemper
  */
 class Query9 extends QueryNoCanceled {
-    int indAirTime = BaseColumn.AirTime.ordinal();
-    int indDistance = BaseColumn.Distance.ordinal();
+    static final int indAirTime = BaseColumn.AirTime.ordinal();
+    static final int indDistance = BaseColumn.Distance.ordinal();
     int sumAirTime = 0;
     int sumDistance  = 0;
     
