@@ -1,5 +1,5 @@
 /**
  * @author Kemper F.M. 
- * @version 0.9.7
+ * @version 0.9.8
  */
 package airlinesdatasciencerunner;
