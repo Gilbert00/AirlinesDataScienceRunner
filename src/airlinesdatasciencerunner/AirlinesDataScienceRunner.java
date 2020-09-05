@@ -231,7 +231,7 @@ class Query1 extends QueryTemplate implements InterfaceCanceledEmpty, InterfaceD
     }
 }
 
-class Query2 extends QueryTemplate  implements InterfaceCanceled, InterfaceDiverted {
+class Query2 extends QueryTemplate  implements InterfaceCanceledEmpty, InterfaceDivertedEmpty {
     Map<String,Integer> hash = new HashMap<>();
     List<Map.Entry<String,Integer>> list;
     static final int indKey = BaseColumn.CancellationCode.ordinal();
