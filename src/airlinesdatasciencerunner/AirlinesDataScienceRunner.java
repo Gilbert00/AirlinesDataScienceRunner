@@ -5,7 +5,7 @@
  */
 /**
  * @author Kemper F.M. 
- * @version 0.9.9
+ * @version 0.9.10
  */
 package airlinesdatasciencerunner;
 
@@ -49,7 +49,19 @@ enum BaseColumn {
    ColumnType getType(){ return type; }
 }
 
-interface InterfaceCanceled {
+interface InterfaceCanceledEmpty {
+    default boolean canceledRecord(String[] record) {
+        return false;
+    }
+}
+
+interface InterfaceDivertedEmpty {
+    default boolean divertedRecord(String[] record) {
+        return false;
+    }
+}
+
+interface InterfaceCanceled extends InterfaceCanceledEmpty {
     default boolean canceledRecord(String[] record) {
         String sCanceled = record[BaseColumn.Cancelled.ordinal()];
         String sCancelCode = record[BaseColumn.CancellationCode.ordinal()].trim();
@@ -59,14 +71,14 @@ interface InterfaceCanceled {
     }
 }
 
-interface InterfaceDiverted {
+interface InterfaceDiverted extends InterfaceDivertedEmpty{
     default boolean divertedRecord(String[] record) {
         String sDiverted = record[BaseColumn.Diverted.ordinal()];
         return isInt(sDiverted) && (new Integer(sDiverted))==1;
     }
 }
 
-class QueryTemplate implements InterfaceCanceled, InterfaceDiverted{
+class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 
     protected static final String COMMA_DELIMITER = ",";
 //    protected static final String CSV_FILE = "Q:\\Java-School\\Project_2_DSWA\\flights_small.csv"; 
@@ -117,15 +129,15 @@ class QueryTemplate implements InterfaceCanceled, InterfaceDiverted{
         return true;
     }
     
-    @Override    
-    public final boolean canceledRecord(String[] record) {
-        return false;
-    }
-    
-    @Override    
-    public final boolean divertedRecord(String[] record) {
-        return false;
-    }
+//    @Override    
+//    public final boolean canceledRecord(String[] record) {
+//        return false;
+//    }
+//    
+//    @Override    
+//    public final boolean divertedRecord(String[] record) {
+//        return false;
+//    }
     
     protected void processingRecord(String[] record) {
 //TODO        
@@ -152,7 +164,7 @@ class QueryTemplate implements InterfaceCanceled, InterfaceDiverted{
 }
 
 
-class Query1 extends QueryTemplate implements InterfaceCanceled, InterfaceDiverted {
+class Query1 extends QueryTemplate implements InterfaceCanceledEmpty, InterfaceDiverted {
     class HashVal {
         int count;
         int cancelled;
