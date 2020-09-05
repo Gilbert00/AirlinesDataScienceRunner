@@ -164,7 +164,7 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 }
 
 
-class Query1 extends QueryTemplate implements InterfaceCanceledEmpty, InterfaceDiverted {
+class Query1 extends QueryTemplate implements InterfaceDiverted {
     class HashVal {
         int count;
         int cancelled;
@@ -231,7 +231,7 @@ class Query1 extends QueryTemplate implements InterfaceCanceledEmpty, InterfaceD
     }
 }
 
-class Query2 extends QueryTemplate  implements InterfaceCanceledEmpty, InterfaceDivertedEmpty {
+class Query2 extends QueryTemplate {
     Map<String,Integer> hash = new HashMap<>();
     List<Map.Entry<String,Integer>> list;
     static final int indKey = BaseColumn.CancellationCode.ordinal();
