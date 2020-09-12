@@ -5,7 +5,7 @@
  */
 /**
  * @author Kemper F.M. 
- * @version 0.9.11
+ * @version 0.9.12
  */
 package airlinesdatasciencerunner;
 
@@ -86,7 +86,7 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
     protected static final String CSV_FILE = "Q:\\Java-School\\Project_2_DSWA\\flights.csv"; 
     protected static FormattedOutput fout;
     protected Stream<String> lines;
-    protected Stream<String[]> values;
+    protected Stream<String[]> linesFiltered;
     
     static void setFOut(FormattedOutput fout){
         QueryTemplate.fout = fout;
@@ -110,7 +110,7 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 // int buffer = 16384 * 16384;   1048576     
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_FILE))) {
             lines = br.lines();
-            values = lines.map(line -> line.split(COMMA_DELIMITER))
+            linesFiltered = lines.map(line -> line.split(COMMA_DELIMITER))
                                         .filter(v -> ! v[0].equals("DayofMonth"))
                                         .filter(v -> filteredRecord(v) && ! canceledRecord(v) && ! divertedRecord(v));
             
@@ -122,7 +122,7 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 //                values = line.split(COMMA_DELIMITER);
 //                records.add(Arrays.asList(values));
 //                if ( filteredRecord (values) && ! canceledRecord(values) && ! divertedRecord(values) ) {
-                    processingRecords(values);
+                    processingRecords(linesFiltered);
 //                }
 //            }
         } catch (IOException e) {
@@ -194,7 +194,7 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 //    }
 //
 //    @Override        
-//    protected void processingRecords(String[] record) {
+//    protected void processingRecords(Stream<String[]> lines) {
 //        String key = record[indUniqueCarrier].trim();
 //        String sCancelled = record[indCancelled];
 //        boolean isCancelled = (isInt(sCancelled) && (new Integer(sCancelled))>0);
@@ -251,7 +251,7 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 //    }
 //
 //    @Override        
-//    protected void processingRecords(String[] record) {
+//    protected void processingRecords(Stream<String[]> lines) {
 //        String sCancellationCode = record[indKey].trim();
 //        incrHashValue(hash, sCancellationCode, 1);
 //    }
@@ -288,7 +288,7 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 //    }
 //
 //    @Override        
-//    protected void processingRecords(String[] record) {
+//    protected void processingRecords(Stream<String[]> lines) {
 //        String sTailNum = record[indTailNum].trim();
 //        int iDistance = new Integer(record[indDistance]);
 //        incrHashValue(hash, sTailNum, iDistance);
@@ -326,7 +326,7 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 //    }
 //
 //    @Override        
-//    protected void processingRecords(String[] record) {
+//    protected void processingRecords(Stream<String[]> lines) {
 //        String sOriginAirportID = record[indOriginAirportID].trim();
 //        String sDestAirportID = record[indDestAirportID].trim();
 //        incrHashValue(hash, sOriginAirportID, 1);
@@ -365,7 +365,7 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 //    }
 //
 //    @Override        
-//    protected void processingRecords(String[] record) {
+//    protected void processingRecords(Stream<String[]> lines) {
 //        String sOriginAirportID = record[indOriginAirportID].trim();
 //        String sDestAirportID = record[indDestAirportID].trim();
 //        incrHashValue(hash, sOriginAirportID, 1);
@@ -404,7 +404,7 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 //    }
 //
 //    @Override        
-//    protected void processingRecords(String[] record) {
+//    protected void processingRecords(Stream<String[]> lines) {
 //        String sOriginAirportID = record[indOriginAirportID].trim();
 //        String sDestAirportID = record[indDestAirportID].trim();
 //        incrHashValue(hash, sOriginAirportID, -1);
@@ -443,7 +443,7 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 //    }
 //    
 //    @Override    
-//    protected void processingRecords(String[] record) {
+//    protected void processingRecords(Stream<String[]> lines) {
 //        String sUniqueCarrier = record[indUniqueCarrier].trim();
 //        if (sUniqueCarrier.equals("AA")){
 //           int iDepDelay = new Integer(record[indDepDelay]);
@@ -461,44 +461,53 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 //    }
 //}
 //
-//class Query8 extends QueryTemplate implements InterfaceCanceled, InterfaceDiverted {
-//    int mDayOfMonth = 0;
-//    int mDepDelay = 0;
-//    String mTailNum = "";
-//    
-//    static final int indDepDelay = BaseColumn.DepDelay.ordinal();
-//    static final int indArrDelay = BaseColumn.ArrDelay.ordinal();       
-//    static final int indDayOfMonth = BaseColumn.DayofMonth.ordinal();       
-//    static final int indTailNum = BaseColumn.TailNum.ordinal();       
-//    
-//    @Override    
-//    protected boolean filteredRecord(String[] record) {
-//        String sDepDelay = record[indDepDelay];
-//        String sDayOfMonth = record[indDayOfMonth];
-//        String sTailNum  = record[indTailNum].trim();       
-//        String sArrDelay = record[indArrDelay];
-//        return isInt(sDepDelay) && isInt(sDayOfMonth) && isInt(sArrDelay) && sTailNum.length()>0;
-//    }
-//
-//    @Override        
-//    protected void processingRecords(String[] record) {
-//        int iArrDelay = new Integer(record[indArrDelay]);
-//        if (iArrDelay<=0) {
-//            int iDepDelay = new Integer(record[indDepDelay]);
-//            if (iDepDelay > mDepDelay) {
-//                mDepDelay = iDepDelay;
-//                mDayOfMonth = new Integer(record[indDayOfMonth]);
-//                mTailNum = record[indTailNum].trim();       
-//            }
-//        }
-//    }
-//    
-//    @Override        
-//    protected void writeResult(FormattedOutput fout) {
-//        String result = String.format("%d,%d,%s", mDayOfMonth, mDepDelay, mTailNum);
-//        fout.addAnswer(8, result);
-//    }
-//}
+class Query8 extends QueryTemplate implements InterfaceCanceled, InterfaceDiverted {
+    static final int indDepDelay = BaseColumn.DepDelay.ordinal();
+    static final int indArrDelay = BaseColumn.ArrDelay.ordinal();       
+    static final int indDayOfMonth = BaseColumn.DayofMonth.ordinal();       
+    static final int indTailNum = BaseColumn.TailNum.ordinal();       
+
+    private class Q8Inner{
+        String mTailNum;
+        int mDayOfMonth;
+        int mDepDelay;
+
+        private Q8Inner(String mTailNum, int mDayOfMonth, int mDepDelay) {
+            this.mTailNum = mTailNum;
+            this.mDayOfMonth = mDayOfMonth;
+            this.mDepDelay = mDepDelay;
+        }
+    }
+    
+    private Optional<Q8Inner> maxRec;
+    
+    @Override    
+    protected boolean filteredRecord(String[] record) {
+        String sDepDelay = record[indDepDelay];
+        String sDayOfMonth = record[indDayOfMonth];
+        String sTailNum  = record[indTailNum].trim();       
+        String sArrDelay = record[indArrDelay];
+        return isInt(sDepDelay) && isInt(sDayOfMonth) && isInt(sArrDelay) && sTailNum.length()>0;
+    }
+
+    @Override        
+    protected void processingRecords(Stream<String[]> lines) {
+        Stream<String[]> linesQ8 = lines.filter(v -> (new Integer(v[indArrDelay]) <=0) );
+        Stream<Q8Inner> records = linesQ8.map(v -> new Q8Inner(v[indTailNum].trim(), 
+                                                               new Integer(v[indDayOfMonth]),
+                                                               new Integer(v[indDepDelay]) ) );
+        maxRec = records.max( (v1,v2) -> v1.mDepDelay - v2.mDepDelay );
+        
+    }
+    
+    @Override        
+    protected void writeResult(FormattedOutput fout) {
+        String result = String.format("%d,%d,%s", maxRec.get().mDayOfMonth, 
+                                                  maxRec.get().mDepDelay, 
+                                                  maxRec.get().mTailNum);
+        fout.addAnswer(8, result);
+    }
+}
 
 /**
  * Вычисляет среднюю скорость по всем рейсам
@@ -531,9 +540,6 @@ class Query9 extends QueryTemplate implements InterfaceCanceled {
             sumAirTime += new Integer(record[indAirTime]);
             sumDistance += new Integer(record[indDistance]);
         }
-
-//        sumAirTime += new Integer(record[indAirTime]);
-//        sumDistance += new Integer(record[indDistance]);
     }
     
     @Override        
@@ -561,7 +567,7 @@ class AirlinesDataScience {
 //        new Query5().run(); 
 //        new Query6().run(); 
 //        new Query7().run(); 
-//        new Query8().run(); 
+        new Query8().run(); 
         new Query9().run();
 
         outResult(fout);        
