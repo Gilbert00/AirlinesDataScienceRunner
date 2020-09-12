@@ -5,7 +5,7 @@
  */
 /**
  * @author Kemper F.M. 
- * @version 0.9.12
+ * @version 0.9.13
  */
 package airlinesdatasciencerunner;
 
@@ -429,21 +429,29 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 //    }
 //}
 //
-//class Query7 extends QueryTemplate implements InterfaceCanceled, InterfaceDiverted {
-//    int result = 0;
-//    static final int indDepDelay = BaseColumn.DepDelay.ordinal();
-//    static final int indArrDelay = BaseColumn.ArrDelay.ordinal();
-//    static final int indUniqueCarrier = BaseColumn.UniqueCarrier.ordinal();
-//
-//    @Override    
-//    protected boolean filteredRecord(String[] record) {
-//        String sDepDelay = record[indDepDelay];
-//        String sArrDelay = record[indArrDelay];
-//        return isInt(sDepDelay) && isInt(sArrDelay); 
-//    }
-//    
-//    @Override    
-//    protected void processingRecords(Stream<String[]> lines) {
+class Query7 extends QueryTemplate implements InterfaceCanceled, InterfaceDiverted {
+    int result = 0;
+    static final int indDepDelay = BaseColumn.DepDelay.ordinal();
+    static final int indArrDelay = BaseColumn.ArrDelay.ordinal();
+    static final int indUniqueCarrier = BaseColumn.UniqueCarrier.ordinal();
+
+    @Override    
+    protected boolean filteredRecord(String[] record) {
+        String sDepDelay = record[indDepDelay];
+        String sArrDelay = record[indArrDelay];
+        return isInt(sDepDelay) && isInt(sArrDelay); 
+    }
+    
+    @Override    
+    protected void processingRecords(Stream<String[]> lines) {
+        Stream<String[]> linesQ7 = lines.filter(v -> v[indUniqueCarrier].trim().equals("AA") )
+                                        .filter(v -> {
+                                                int iDepDelay = new Integer(v[indDepDelay]);
+                                                int iArrDelay = new Integer(v[indArrDelay]);
+                                                return (iDepDelay>=60 || iArrDelay>=60);
+                                        });
+        result = (int)linesQ7.count();
+        
 //        String sUniqueCarrier = record[indUniqueCarrier].trim();
 //        if (sUniqueCarrier.equals("AA")){
 //           int iDepDelay = new Integer(record[indDepDelay]);
@@ -453,14 +461,14 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 //               result++;
 //           }
 //        }
-//    }
-//
-//    @Override    
-//    protected void writeResult(FormattedOutput fout) {
-//        fout.addAnswer(7, result);
-//    }
-//}
-//
+    }
+
+    @Override    
+    protected void writeResult(FormattedOutput fout) {
+        fout.addAnswer(7, result);
+    }
+}
+
 class Query8 extends QueryTemplate implements InterfaceCanceled, InterfaceDiverted {
     static final int indDepDelay = BaseColumn.DepDelay.ordinal();
     static final int indArrDelay = BaseColumn.ArrDelay.ordinal();       
@@ -566,7 +574,7 @@ class AirlinesDataScience {
 //        new Query4().run(); 
 //        new Query5().run(); 
 //        new Query6().run(); 
-//        new Query7().run(); 
+        new Query7().run(); 
         new Query8().run(); 
         new Query9().run();
 
