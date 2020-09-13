@@ -5,7 +5,7 @@
  */
 /**
  * @author Kemper F.M. 
- * @version 0.9.13
+ * @version 1.0.3
  */
 package airlinesdatasciencerunner;
 
@@ -110,8 +110,8 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 // int buffer = 16384 * 16384;   1048576     
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_FILE))) {
             lines = br.lines();
-            linesFiltered = lines.map(line -> line.split(COMMA_DELIMITER))
-                                        .filter(v -> ! v[0].equals("DayofMonth"))
+            linesFiltered = lines.map(line -> line.split(COMMA_DELIMITER)).skip(1)
+//                                        .filter(v -> ! v[0].equals("DayofMonth"))
                                         .filter(v -> filteredRecord(v) && ! canceledRecord(v) && ! divertedRecord(v));
             
 //            String line = "";
@@ -451,16 +451,6 @@ class Query7 extends QueryTemplate implements InterfaceCanceled, InterfaceDivert
                                                 return (iDepDelay>=60 || iArrDelay>=60);
                                         });
         result = (int)linesQ7.count();
-        
-//        String sUniqueCarrier = record[indUniqueCarrier].trim();
-//        if (sUniqueCarrier.equals("AA")){
-//           int iDepDelay = new Integer(record[indDepDelay]);
-//           int iArrDelay = new Integer(record[indArrDelay]);
-//           
-//           if (iDepDelay>=60 || iArrDelay>=60) {
-//               result++;
-//           }
-//        }
     }
 
     @Override    
