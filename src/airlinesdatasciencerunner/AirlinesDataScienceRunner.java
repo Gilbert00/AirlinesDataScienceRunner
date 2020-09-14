@@ -5,13 +5,14 @@
  */
 /**
  * @author Kemper F.M. 
- * @version 1.0.3.1
+ * @version 1.0.4
  */
 package airlinesdatasciencerunner;
 
 import static airlinesdatasciencerunner.QueryTemplate.isInt;
 import java.io.*;
 import java.util.*; 
+import static java.util.stream.Collectors.*;
 import java.util.stream.Stream;
 
 enum ColumnType {
@@ -172,29 +173,68 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 }
 
 
-//class Query1 extends QueryTemplate implements InterfaceDiverted {
-//    class HashVal {
-//        int count;
-//        int cancelled;
-//        double proc; 
-//    }
-//
-//    Map<String,HashVal> hash = new HashMap<>();
-//    List<Map.Entry<String,HashVal>> list;
-//    static final int indCancelled = BaseColumn.Cancelled.ordinal();
-//    static final int indUniqueCarrier = BaseColumn.UniqueCarrier.ordinal();
-//    
-//    @Override    
-//    protected boolean filteredRecord(String[] record) {
+class Query1 extends QueryTemplate implements InterfaceDiverted {
+    static final int indCancelled = BaseColumn.Cancelled.ordinal();
+    static final int indUniqueCarrier = BaseColumn.UniqueCarrier.ordinal();
+    
+    private class Q1Inner {
+        String sUniqueCarrier;
+        String sCancelled;
+        
+        private Q1Inner (String sUniqueCarrier, String sCancelled) {
+            this.sUniqueCarrier = sUniqueCarrier;
+            this.sCancelled = sCancelled;
+        }
+
+            private String getCancelled() {
+                return sCancelled;
+        }
+
+            private String getUniqueCarrier() {
+                return sUniqueCarrier;
+            }
+
+    }
+
+    private class HashVal {
+        int count;
+        int cancelled;
+        double proc; 
+
+        public HashVal(int count, int cancelled, double proc) {
+            this.count = count;
+            this.cancelled = cancelled;
+            this.proc = proc;
+        }
+    }
+
+    
+    Map<String,HashVal> hash = new HashMap<>();
+    List<Map.Entry<String,HashVal>> list;
+    HashVal hashVal0 = new HashVal(0, 0, 0.0);
+    
+    @Override    
+    protected boolean filteredRecord(String[] record) {
 //        String sDiverted = record[BaseColumn.Diverted.ordinal()];
 //        if (isInt(sDiverted) && (new Integer(sDiverted))==1) return false;
-//
-//        String sUniqueCarrier = record[indUniqueCarrier].trim();
-//        return sUniqueCarrier.length() > 0; 
-//    }
-//
-//    @Override        
-//    protected void processingRecords(Stream<String[]> lines) {
+
+        String sUniqueCarrier = record[indUniqueCarrier].trim();
+        return sUniqueCarrier.length() > 0; 
+    }
+
+    @Override        
+    protected void processingRecords(Stream<String[]> lines) {
+        Stream<Q1Inner> strmInner = lines.map(v -> new Q1Inner(v[indUniqueCarrier].trim(),
+                                                               v[indCancelled]));
+        Map<String,HashVal> hash = strmInner.collect(groupingBy(Q1Inner::getUniqueCarrier), 
+                                                     reducing(hashVal0, 
+                                                          (Q1Inner x) -> {String strCancelled = x.getCancelled();
+                                                                    boolean isCancelled = (isInt(strCancelled) && (new Integer(strCancelled))>0);
+                                                                    return isCancelled ? new HashVal(1, 1, 0.0) : new HashVal(1, 0, 0.0);             
+                                                                   },
+                                                             (HashVal v1, HashVal v2) -> new HashVal(v1.count+v2.count, v1.cancelled+v2.cancelled, 0.0)
+                                                              ) );
+        
 //        String key = record[indUniqueCarrier].trim();
 //        String sCancelled = record[indCancelled];
 //        boolean isCancelled = (isInt(sCancelled) && (new Integer(sCancelled))>0);
@@ -210,35 +250,35 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 //            val.proc = 0;
 //        }
 //        hash.put(key, val);
-//    }
-//
-//    @Override        
-//    protected void calcQuery() {
-//        hash.forEach((k,v)-> v.proc = (double)100.0 * v.cancelled / v.count);
-//        
-//        list = new ArrayList<>(hash.entrySet());
-//
-//        Collections.sort(list, 
-//                         (Map.Entry<String, HashVal> e1, Map.Entry<String, HashVal> e2) -> {
-//                            Double v1 = e1.getValue().proc;
-//                            Double v2 = e2.getValue().proc;
-//                            return v1.compareTo(v2);
-//                         } 
-//        ) ;
-//        
-//        writeResult(QueryTemplate.fout);        
-//    }
-//
-//    @Override        
-//    protected void writeResult(FormattedOutput fout) {
-//        int indMax = list.size()-1;
-//        String key = list.get(indMax).getKey();
-//        double proc = list.get(indMax).getValue().proc;
-//        String result = String.format(Locale.US,"%s,%-20.10f", key, proc);
-//        fout.addAnswer(1, result);
-//    }
-//}
-//
+    }
+
+    @Override        
+    protected void calcQuery() {
+        hash.forEach((k,v)-> v.proc = (double)100.0 * v.cancelled / v.count);
+        
+        list = new ArrayList<>(hash.entrySet());
+
+        Collections.sort(list, 
+                         (Map.Entry<String, HashVal> e1, Map.Entry<String, HashVal> e2) -> {
+                            Double v1 = e1.getValue().proc;
+                            Double v2 = e2.getValue().proc;
+                            return v1.compareTo(v2);
+                         } 
+        ) ;
+        
+        writeResult(QueryTemplate.fout);        
+    }
+
+    @Override        
+    protected void writeResult(FormattedOutput fout) {
+        int indMax = list.size()-1;
+        String key = list.get(indMax).getKey();
+        double proc = list.get(indMax).getValue().proc;
+        String result = String.format(Locale.US,"%s,%-20.10f", key, proc);
+        fout.addAnswer(1, result);
+    }
+}
+
 //class Query2 extends QueryTemplate {
 //    Map<String,Integer> hash = new HashMap<>();
 //    List<Map.Entry<String,Integer>> list;
