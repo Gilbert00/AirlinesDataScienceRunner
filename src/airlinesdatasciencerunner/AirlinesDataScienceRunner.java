@@ -5,7 +5,7 @@
  */
 /**
  * @author Kemper F.M. 
- * @version 1.0.3
+ * @version 1.0.3.1
  */
 package airlinesdatasciencerunner;
 
@@ -515,10 +515,19 @@ class Query8 extends QueryTemplate implements InterfaceCanceled, InterfaceDivert
 class Query9 extends QueryTemplate implements InterfaceCanceled {
     static final int indAirTime = BaseColumn.AirTime.ordinal();
     static final int indDistance = BaseColumn.Distance.ordinal();
-    int sumAirTime = 0;
-    int sumDistance  = 0;
     
-//    Stream<Q9Inner> strmInner;
+    private class Q9Inner {
+        int sumAirTime;
+        int sumDistance;
+
+        public Q9Inner(int sumAirTime, int sumDistance) {
+            this.sumAirTime = sumAirTime;
+            this.sumDistance = sumDistance;
+        }
+    }
+
+    Q9Inner  strm0 = new Q9Inner(0, 0);
+    Q9Inner  sumInner;
     
     @Override        
     protected boolean filteredRecord(String[] record) {
@@ -530,20 +539,20 @@ class Query9 extends QueryTemplate implements InterfaceCanceled {
     
     @Override        
     protected void processingRecords(Stream<String[]> lines) {
-//        strmInner = lines.map(v -> new Q9Inner(new Integer(v[indAirTime]), new Integer(v[indDistance])))
-//                         .reduce();
-        Iterator<String[]> itr = lines.iterator();
-        while(itr.hasNext()) {
-            String[] record = itr.next();
-            sumAirTime += new Integer(record[indAirTime]);
-            sumDistance += new Integer(record[indDistance]);
-        }
+        sumInner = lines.map(v -> new Q9Inner(new Integer(v[indAirTime]), new Integer(v[indDistance])))
+                         .reduce(strm0, (v1,v2) -> new Q9Inner(v1.sumAirTime + v2.sumAirTime, v1.sumDistance + v2.sumDistance)  );
+//        Iterator<String[]> itr = lines.iterator();
+//        while(itr.hasNext()) {
+//            String[] record = itr.next();
+//            sumAirTime += new Integer(record[indAirTime]);
+//            sumDistance += new Integer(record[indDistance]);
+//        }
     }
     
     @Override        
     protected void writeResult(FormattedOutput fout) {
 //TODO  
-        float v = (float)60.0 * sumDistance / sumAirTime;
+        float v = (float)60.0 * sumInner.sumDistance / sumInner.sumAirTime;
         String result = String.format(Locale.US,"Average speed is %f km/hour", v);
         fout.addAnswer(9, result);
     }
