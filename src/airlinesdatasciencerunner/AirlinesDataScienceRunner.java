@@ -14,6 +14,7 @@ import java.io.*;
 import java.util.*; 
 import static java.util.stream.Collectors.*;
 import java.util.stream.Stream;
+//import java.util.stream.*;
 
 enum ColumnType {
     INT, STR, DATE
@@ -215,8 +216,6 @@ class Query1 extends QueryTemplate implements InterfaceDiverted {
     
     @Override    
     protected boolean filteredRecord(String[] record) {
-//        String sDiverted = record[BaseColumn.Diverted.ordinal()];
-//        if (isInt(sDiverted) && (new Integer(sDiverted))==1) return false;
 
         String sUniqueCarrier = record[indUniqueCarrier].trim();
         return sUniqueCarrier.length() > 0; 
@@ -226,30 +225,17 @@ class Query1 extends QueryTemplate implements InterfaceDiverted {
     protected void processingRecords(Stream<String[]> lines) {
         Stream<Q1Inner> strmInner = lines.map(v -> new Q1Inner(v[indUniqueCarrier].trim(),
                                                                v[indCancelled]));
-        Map<String,HashVal> hash = strmInner.collect(groupingBy(Q1Inner::getUniqueCarrier), 
+//        System.out.println(strmInner.count());
+        hash = strmInner.collect(groupingBy(Q1Inner::getUniqueCarrier, 
                                                      reducing(hashVal0, 
                                                           (Q1Inner x) -> {String strCancelled = x.getCancelled();
                                                                     boolean isCancelled = (isInt(strCancelled) && (new Integer(strCancelled))>0);
                                                                     return isCancelled ? new HashVal(1, 1, 0.0) : new HashVal(1, 0, 0.0);             
                                                                    },
                                                              (HashVal v1, HashVal v2) -> new HashVal(v1.count+v2.count, v1.cancelled+v2.cancelled, 0.0)
-                                                              ) );
-        
-//        String key = record[indUniqueCarrier].trim();
-//        String sCancelled = record[indCancelled];
-//        boolean isCancelled = (isInt(sCancelled) && (new Integer(sCancelled))>0);
-//        
-//        HashVal val = hash.get(key);
-//        if (val!=null) {
-//            val.count++;
-//            val.cancelled += isCancelled ? 1 : 0;
-//        }else {
-//            val = new HashVal();
-//            val.count = 1;
-//            val.cancelled = isCancelled ? 1 : 0;
-//            val.proc = 0;
-//        }
-//        hash.put(key, val);
+                                                              ) ));
+
+//        System.out.println(hash.keySet().isEmpty());
     }
 
     @Override        
@@ -258,6 +244,8 @@ class Query1 extends QueryTemplate implements InterfaceDiverted {
         
         list = new ArrayList<>(hash.entrySet());
 
+//        System.out.println(list.isEmpty());
+        
         Collections.sort(list, 
                          (Map.Entry<String, HashVal> e1, Map.Entry<String, HashVal> e2) -> {
                             Double v1 = e1.getValue().proc;
@@ -607,7 +595,7 @@ class AirlinesDataScience {
         fout = new FormattedOutput();
         QueryTemplate.setFOut(fout); 
         
-//        new Query1().run(); 
+        new Query1().run(); 
 //        new Query2().run();
 //        new Query3().run(); 
 //        new Query4().run(); 
