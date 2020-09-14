@@ -5,7 +5,7 @@
  */
 /**
  * @author Kemper F.M. 
- * @version 1.0.4
+ * @version 1.0.5
  */
 package airlinesdatasciencerunner;
 
@@ -138,17 +138,7 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
 //TODO        
         return true;
     }
-    
-//    @Override    
-//    public final boolean canceledRecord(String[] record) {
-//        return false;
-//    }
-//    
-//    @Override    
-//    public final boolean divertedRecord(String[] record) {
-//        return false;
-//    }
-    
+      
     protected void processingRecords(Stream<String[]> lines) {
 //TODO        
     }
@@ -267,41 +257,54 @@ class Query1 extends QueryTemplate implements InterfaceDiverted {
     }
 }
 
-//class Query2 extends QueryTemplate {
-//    Map<String,Integer> hash = new HashMap<>();
-//    List<Map.Entry<String,Integer>> list;
-//    static final int indKey = BaseColumn.CancellationCode.ordinal();
-//    
-//    @Override    
-//    protected boolean filteredRecord(String[] record) {
-//        String sCancellationCode = record[indKey].trim();
-//        return sCancellationCode.length() > 0;
-//    }
-//
-//    @Override        
-//    protected void processingRecords(Stream<String[]> lines) {
-//        String sCancellationCode = record[indKey].trim();
-//        incrHashValue(hash, sCancellationCode, 1);
-//    }
-//
-//    @Override        
-//    protected void calcQuery() {
-//        list = new ArrayList(hash.entrySet());
-//        Collections.sort( list, 
-//                          (Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) -> 
-//                                e1.getValue().compareTo(e2.getValue() ) 
-//        );
-//        
-//        writeResult(QueryTemplate.fout);        
-//    }
-//
-//    @Override        
-//    protected void writeResult(FormattedOutput fout) {
-//        String result = list.get(list.size()-1).getKey();
-//        fout.addAnswer(2, result);
-//    }
-//}
-//
+class Query2 extends QueryTemplate {
+    Map<String,Long> hash = new HashMap<>();
+    List<Map.Entry<String,Long>> list;
+    static final int indKey = BaseColumn.CancellationCode.ordinal();
+    
+    private class Q2Inner{
+        String sCancellationCode;
+
+        private Q2Inner(String sCancellationCode) {
+            this.sCancellationCode = sCancellationCode;
+        }
+
+        private String getsCancellationCode() {
+            return sCancellationCode;
+        }
+    }
+    
+    @Override    
+    protected boolean filteredRecord(String[] record) {
+        String sCancellationCode = record[indKey].trim();
+        return sCancellationCode.length() > 0;
+    }
+
+    @Override        
+    protected void processingRecords(Stream<String[]> lines) {
+        Stream<Q2Inner> strmInner = lines.map(v -> new Q2Inner(v[indKey].trim()));
+
+        hash = strmInner.collect(groupingBy(Q2Inner::getsCancellationCode, counting()));
+    }
+
+    @Override        
+    protected void calcQuery() {
+        list = new ArrayList(hash.entrySet());
+        Collections.sort( list, 
+                          (Map.Entry<String, Long> e1, Map.Entry<String, Long> e2) -> 
+                                e1.getValue().compareTo(e2.getValue() ) 
+        );
+        
+        writeResult(QueryTemplate.fout);        
+    }
+
+    @Override        
+    protected void writeResult(FormattedOutput fout) {
+        String result = list.get(list.size()-1).getKey();
+        fout.addAnswer(2, result);
+    }
+}
+
 //class Query3 extends QueryTemplate implements InterfaceCanceled {
 //    Map<String,Integer> hash = new HashMap<String,Integer>();
 //    List<Map.Entry<String,Integer>> list;
@@ -596,7 +599,7 @@ class AirlinesDataScience {
         QueryTemplate.setFOut(fout); 
         
         new Query1().run(); 
-//        new Query2().run();
+        new Query2().run();
 //        new Query3().run(); 
 //        new Query4().run(); 
 //        new Query5().run(); 
