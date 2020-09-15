@@ -5,7 +5,7 @@
  */
 /**
  * @author Kemper F.M. 
- * @version 1.0.7
+ * @version 1.0.8
  */
 package airlinesdatasciencerunner;
 
@@ -151,6 +151,12 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
             hash.put(key, d);
         }
     }
+    
+    protected int getIndQ(){
+        String cl = this.getClass().getSimpleName();
+        int indQ = new Integer(cl.substring(cl.length()-1)) ;
+        return indQ;        
+    }
 }
 
 abstract class Query456 extends QueryTemplate implements InterfaceCanceled {
@@ -159,7 +165,7 @@ abstract class Query456 extends QueryTemplate implements InterfaceCanceled {
     static final int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
     static final int indDestAirportID = BaseColumn.DestAirportID.ordinal();
     
-    protected int indQ;
+    //protected int indQ;
     
     @Override    
     protected boolean filteredRecord(String[] record) {
@@ -196,10 +202,8 @@ abstract class Query456 extends QueryTemplate implements InterfaceCanceled {
 
     @Override        
     protected void writeResult(FormattedOutput fout) {
-        String cl = this.getClass().getSimpleName();
-        indQ = new Integer(cl.substring(cl.length()-1)) ;
         String result = list.get(list.size()-1).getKey();
-        fout.addAnswer(indQ, result);
+        fout.addAnswer(getIndQ(), result);
     }
     
     abstract protected void addHashVal(String sOriginAirportID, String sDestAirportID);
@@ -296,7 +300,7 @@ class Query1 extends QueryTemplate implements InterfaceDiverted {
         String key = list.get(indMax).getKey();
         double proc = list.get(indMax).getValue().proc;
         String result = String.format(Locale.US,"%s,%-20.10f", key, proc);
-        fout.addAnswer(1, result);
+        fout.addAnswer(getIndQ(), result);
     }
 }
 
@@ -344,7 +348,7 @@ class Query2 extends QueryTemplate {
     @Override        
     protected void writeResult(FormattedOutput fout) {
         String result = list.get(list.size()-1).getKey();
-        fout.addAnswer(2, result);
+        fout.addAnswer(getIndQ(), result);
     }
 }
 
@@ -402,7 +406,7 @@ class Query3 extends QueryTemplate implements InterfaceCanceled {
     @Override        
     protected void writeResult(FormattedOutput fout) {
         String result = list.get(list.size()-1).getKey();
-        fout.addAnswer(3, result);
+        fout.addAnswer(getIndQ(), result);
     }
 }
 
@@ -459,7 +463,7 @@ class Query7 extends QueryTemplate implements InterfaceCanceled, InterfaceDivert
 
     @Override    
     protected void writeResult(FormattedOutput fout) {
-        fout.addAnswer(7, result);
+        fout.addAnswer(getIndQ(), result);
     }
 }
 
@@ -507,7 +511,7 @@ class Query8 extends QueryTemplate implements InterfaceCanceled, InterfaceDivert
         String result = String.format("%d,%d,%s", maxRec.get().mDayOfMonth, 
                                                   maxRec.get().mDepDelay, 
                                                   maxRec.get().mTailNum);
-        fout.addAnswer(8, result);
+        fout.addAnswer(getIndQ(), result);
     }
 }
 
@@ -558,7 +562,7 @@ class Query9 extends QueryTemplate implements InterfaceCanceled {
 //TODO  
         float v = (float)60.0 * sumInner.sumDistance / sumInner.sumAirTime;
         String result = String.format(Locale.US,"Average speed is %f km/hour", v);
-        fout.addAnswer(9, result);
+        fout.addAnswer(getIndQ(), result);
     }
     
 }
