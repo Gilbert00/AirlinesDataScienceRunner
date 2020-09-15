@@ -5,7 +5,7 @@
  */
 /**
  * @author Kemper F.M. 
- * @version 1.0.5
+ * @version 1.0.6
  */
 package airlinesdatasciencerunner;
 
@@ -305,44 +305,64 @@ class Query2 extends QueryTemplate {
     }
 }
 
-//class Query3 extends QueryTemplate implements InterfaceCanceled {
-//    Map<String,Integer> hash = new HashMap<String,Integer>();
-//    List<Map.Entry<String,Integer>> list;
-//    static final int indTailNum = BaseColumn.TailNum.ordinal();
-//    static final int indDistance = BaseColumn.Distance.ordinal();
-//    
-//    @Override    
-//    protected boolean filteredRecord(String[] record) {
-//        String sTailNum = record[indTailNum].trim();
-//        String sDistance = record[indDistance];
-//        return sTailNum.length()>0 && isInt(sDistance);
-//    }
-//
-//    @Override        
-//    protected void processingRecords(Stream<String[]> lines) {
-//        String sTailNum = record[indTailNum].trim();
-//        int iDistance = new Integer(record[indDistance]);
-//        incrHashValue(hash, sTailNum, iDistance);
-//    }
-//
-//    @Override        
-//    protected void calcQuery() {
-//        list = new ArrayList(hash.entrySet());
-//        Collections.sort( list, 
-//                          (Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) -> 
-//                                e1.getValue().compareTo(e2.getValue() ) 
-//        );
-//        
-//        writeResult(QueryTemplate.fout);        
-//    }
-//
-//    @Override        
-//    protected void writeResult(FormattedOutput fout) {
-//        String result = list.get(list.size()-1).getKey();
-//        fout.addAnswer(3, result);
-//    }
-//}
-//
+class Query3 extends QueryTemplate implements InterfaceCanceled {
+    Map<String,Integer> hash = new HashMap<String,Integer>();
+    List<Map.Entry<String,Integer>> list;
+    static final int indTailNum = BaseColumn.TailNum.ordinal();
+    static final int indDistance = BaseColumn.Distance.ordinal();
+    
+    private class Q3Inner {
+        String sTailNum;
+        int iDistance;
+
+        private Q3Inner(String sTailNum, int iDistance) {
+            this.sTailNum = sTailNum;
+            this.iDistance = iDistance;
+        }
+
+        public String getsTailNum() {
+            return sTailNum;
+        }
+
+        public int getiDistance() {
+            return iDistance;
+        }
+    }
+    
+    
+    @Override    
+    protected boolean filteredRecord(String[] record) {
+        String sTailNum = record[indTailNum].trim();
+        String sDistance = record[indDistance];
+        return sTailNum.length()>0 && isInt(sDistance);
+    }
+
+    @Override        
+    protected void processingRecords(Stream<String[]> lines) {
+        Stream<Q3Inner> strmInner = lines.map(v -> new Q3Inner(v[indTailNum].trim(),
+                                                               new Integer(v[indDistance]) ));
+
+        hash = strmInner.collect(groupingBy(Q3Inner::getsTailNum, summingInt(Q3Inner::getiDistance)));
+    }
+
+    @Override        
+    protected void calcQuery() {
+        list = new ArrayList(hash.entrySet());
+        Collections.sort( list, 
+                          (Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) -> 
+                                e1.getValue().compareTo(e2.getValue() ) 
+        );
+        
+        writeResult(QueryTemplate.fout);        
+    }
+
+    @Override        
+    protected void writeResult(FormattedOutput fout) {
+        String result = list.get(list.size()-1).getKey();
+        fout.addAnswer(3, result);
+    }
+}
+
 //class Query4 extends QueryTemplate implements InterfaceCanceled {
 //    Map<String,Integer> hash = new HashMap<>();
 //    List<Map.Entry<String,Integer>> list;
@@ -600,7 +620,7 @@ class AirlinesDataScience {
         
         new Query1().run(); 
         new Query2().run();
-//        new Query3().run(); 
+        new Query3().run(); 
 //        new Query4().run(); 
 //        new Query5().run(); 
 //        new Query6().run(); 
