@@ -1,9 +1,9 @@
 NK,2.5681204840        
 B
 N947JB
-No answer given
-No answer given
-No answer given
+10397
+13930
+11433
 2919
 22,46,N845DN
 Average speed is 439.815918 km/hour

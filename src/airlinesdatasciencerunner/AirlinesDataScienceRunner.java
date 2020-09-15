@@ -5,7 +5,7 @@
  */
 /**
  * @author Kemper F.M. 
- * @version 1.0.6
+ * @version 1.0.7
  */
 package airlinesdatasciencerunner;
 
@@ -113,20 +113,10 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_FILE))) {
             lines = br.lines();
             linesFiltered = lines.map(line -> line.split(COMMA_DELIMITER)).skip(1)
-//                                        .filter(v -> ! v[0].equals("DayofMonth"))
                                         .filter(v -> filteredRecord(v) && ! canceledRecord(v) && ! divertedRecord(v));
             
-//            String line = "";
-//            long count = 0;
-//            while ((line = br.readLine()) != null) {
-//                count++;
-//                if (count == 1) {continue;};
-//                values = line.split(COMMA_DELIMITER);
-//                records.add(Arrays.asList(values));
-//                if ( filteredRecord (values) && ! canceledRecord(values) && ! divertedRecord(values) ) {
                     processingRecords(linesFiltered);
-//                }
-//            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -162,6 +152,59 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
         }
     }
 }
+
+abstract class Query456 extends QueryTemplate implements InterfaceCanceled {
+    Map<String,Integer> hash = new HashMap<>();
+    List<Map.Entry<String,Integer>> list;
+    static final int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
+    static final int indDestAirportID = BaseColumn.DestAirportID.ordinal();
+    
+    protected int indQ;
+    
+    @Override    
+    protected boolean filteredRecord(String[] record) {
+        String sOriginAirportID = record[indOriginAirportID].trim();
+        String sDestAirportID = record[indDestAirportID].trim();
+        return sOriginAirportID.length() > 0 && sDestAirportID.length() > 0;
+    }
+
+    @Override        
+    protected void processingRecords(Stream<String[]> lines) {
+        Iterator<String[]> itr = lines.iterator();
+        while(itr.hasNext()){
+            processingRecord(itr.next());
+        }
+    }
+
+    protected void processingRecord(String[] record) {
+        String sOriginAirportID = record[indOriginAirportID].trim();
+        String sDestAirportID = record[indDestAirportID].trim();
+        
+        addHashVal(sOriginAirportID, sDestAirportID);
+    }
+
+    @Override        
+    protected void calcQuery() {
+        list = new ArrayList(hash.entrySet());
+        Collections.sort( list, 
+                          (Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) -> 
+                                e1.getValue().compareTo(e2.getValue() ) 
+        );
+        
+        writeResult(QueryTemplate.fout);        
+    }
+
+    @Override        
+    protected void writeResult(FormattedOutput fout) {
+        String cl = this.getClass().getSimpleName();
+        indQ = new Integer(cl.substring(cl.length()-1)) ;
+        String result = list.get(list.size()-1).getKey();
+        fout.addAnswer(indQ, result);
+    }
+    
+    abstract protected void addHashVal(String sOriginAirportID, String sDestAirportID);
+}
+
 
 
 class Query1 extends QueryTemplate implements InterfaceDiverted {
@@ -363,123 +406,33 @@ class Query3 extends QueryTemplate implements InterfaceCanceled {
     }
 }
 
-//class Query4 extends QueryTemplate implements InterfaceCanceled {
-//    Map<String,Integer> hash = new HashMap<>();
-//    List<Map.Entry<String,Integer>> list;
-//    static final int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
-//    static final int indDestAirportID = BaseColumn.DestAirportID.ordinal();
-//    
-//    @Override    
-//    protected boolean filteredRecord(String[] record) {
-//        String sOriginAirportID = record[indOriginAirportID].trim();
-//        String sDestAirportID = record[indDestAirportID].trim();
-//        return sOriginAirportID.length() > 0 && sDestAirportID.length() > 0;
-//    }
-//
-//    @Override        
-//    protected void processingRecords(Stream<String[]> lines) {
-//        String sOriginAirportID = record[indOriginAirportID].trim();
-//        String sDestAirportID = record[indDestAirportID].trim();
-//        incrHashValue(hash, sOriginAirportID, 1);
-//        incrHashValue(hash, sDestAirportID, 1);
-//    }
-//
-//    @Override        
-//    protected void calcQuery() {
-//        list = new ArrayList(hash.entrySet());
-//        Collections.sort( list, 
-//                          (Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) -> 
-//                                e1.getValue().compareTo(e2.getValue() ) 
-//        );
-//        
-//        writeResult(QueryTemplate.fout);        
-//    }
-//
-//    @Override        
-//    protected void writeResult(FormattedOutput fout) {
-//        String result = list.get(list.size()-1).getKey();
-//        fout.addAnswer(4, result);
-//    }
-//}
-//
-//class Query5 extends QueryTemplate implements InterfaceCanceled {
-//    Map<String,Integer> hash = new HashMap<>();
-//    List<Map.Entry<String,Integer>> list;
-//    static final int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
-//    static final int indDestAirportID = BaseColumn.DestAirportID.ordinal();
-//    
-//    @Override    
-//    protected boolean filteredRecord(String[] record) {
-//        String sOriginAirportID = record[indOriginAirportID].trim();
-//        String sDestAirportID = record[indDestAirportID].trim();
-//        return sOriginAirportID.length() > 0 && sDestAirportID.length() > 0;
-//    }
-//
-//    @Override        
-//    protected void processingRecords(Stream<String[]> lines) {
-//        String sOriginAirportID = record[indOriginAirportID].trim();
-//        String sDestAirportID = record[indDestAirportID].trim();
-//        incrHashValue(hash, sOriginAirportID, 1);
-//        incrHashValue(hash, sDestAirportID, -1);
-//    }
-//
-//    @Override        
-//    protected void calcQuery() {
-//        list = new ArrayList(hash.entrySet());
-//        Collections.sort( list, 
-//                          (Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) -> 
-//                                e1.getValue().compareTo(e2.getValue() ) 
-//        );
-//        
-//        writeResult(QueryTemplate.fout);        
-//    }
-//
-//    @Override        
-//    protected void writeResult(FormattedOutput fout) {
-//        String result = list.get(list.size()-1).getKey();
-//        fout.addAnswer(5, result);
-//    }
-//}
-//
-//class Query6 extends QueryTemplate implements InterfaceCanceled {
-//    Map<String,Integer> hash = new HashMap<>();
-//    List<Map.Entry<String,Integer>> list;
-//    static final int indOriginAirportID = BaseColumn.OriginAirportID.ordinal();
-//    static final int indDestAirportID = BaseColumn.DestAirportID.ordinal();
-//    
-//    @Override    
-//    protected boolean filteredRecord(String[] record) {
-//        String sOriginAirportID = record[indOriginAirportID].trim();
-//        String sDestAirportID = record[indDestAirportID].trim();
-//        return sOriginAirportID.length() > 0 && sDestAirportID.length() > 0;
-//    }
-//
-//    @Override        
-//    protected void processingRecords(Stream<String[]> lines) {
-//        String sOriginAirportID = record[indOriginAirportID].trim();
-//        String sDestAirportID = record[indDestAirportID].trim();
-//        incrHashValue(hash, sOriginAirportID, -1);
-//        incrHashValue(hash, sDestAirportID, 1);
-//    }
-//
-//    @Override        
-//    protected void calcQuery() {
-//        list = new ArrayList(hash.entrySet());
-//        Collections.sort( list, 
-//                          (Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) -> 
-//                                e1.getValue().compareTo(e2.getValue() ) 
-//        );
-//        
-//        writeResult(QueryTemplate.fout);        
-//    }
-//
-//    @Override        
-//    protected void writeResult(FormattedOutput fout) {
-//        String result = list.get(list.size()-1).getKey();
-//        fout.addAnswer(6, result);
-//    }
-//}
-//
+class Query4 extends Query456 {
+    
+    @Override        
+    protected void addHashVal(String sOriginAirportID, String sDestAirportID) {
+        incrHashValue(hash, sOriginAirportID, 1);
+        incrHashValue(hash, sDestAirportID, 1);
+    };
+}
+
+class Query5 extends Query456 {
+
+    @Override        
+    protected void addHashVal(String sOriginAirportID, String sDestAirportID) {
+        incrHashValue(hash, sOriginAirportID, 1);
+        incrHashValue(hash, sDestAirportID, -1);
+    };
+}
+
+class Query6 extends Query456 {
+
+    @Override        
+    protected void addHashVal(String sOriginAirportID, String sDestAirportID) {
+        incrHashValue(hash, sOriginAirportID, -1);
+        incrHashValue(hash, sDestAirportID, 1);
+    };
+}
+
 class Query7 extends QueryTemplate implements InterfaceCanceled, InterfaceDiverted {
     int result = 0;
     static final int indDepDelay = BaseColumn.DepDelay.ordinal();
@@ -621,9 +574,9 @@ class AirlinesDataScience {
         new Query1().run(); 
         new Query2().run();
         new Query3().run(); 
-//        new Query4().run(); 
-//        new Query5().run(); 
-//        new Query6().run(); 
+        new Query4().run(); 
+        new Query5().run(); 
+        new Query6().run(); 
         new Query7().run(); 
         new Query8().run(); 
         new Query9().run();
