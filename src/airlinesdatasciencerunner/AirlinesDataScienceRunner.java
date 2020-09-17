@@ -5,7 +5,7 @@
  */
 /**
  * @author Kemper F.M. 
- * @version 1.0.8
+ * @version 1.0.8.1
  */
 package airlinesdatasciencerunner;
 
@@ -159,6 +159,11 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
     }
 }
 
+/**
+ * 
+ * Abstract class for queries 4,5,6
+ * @author User
+ */
 abstract class Query456 extends QueryTemplate implements InterfaceCanceled {
     Map<String,Integer> hash = new HashMap<>();
     List<Map.Entry<String,Integer>> list;
@@ -516,7 +521,7 @@ class Query8 extends QueryTemplate implements InterfaceCanceled, InterfaceDivert
 }
 
 /**
- * Вычисляет среднюю скорость по всем рейсам
+ * Average speed by all flights
  * 
  * @author Kemper
  */
@@ -549,17 +554,10 @@ class Query9 extends QueryTemplate implements InterfaceCanceled {
     protected void processingRecords(Stream<String[]> lines) {
         sumInner = lines.map(v -> new Q9Inner(new Integer(v[indAirTime]), new Integer(v[indDistance])))
                          .reduce(strm0, (v1,v2) -> new Q9Inner(v1.sumAirTime + v2.sumAirTime, v1.sumDistance + v2.sumDistance)  );
-//        Iterator<String[]> itr = lines.iterator();
-//        while(itr.hasNext()) {
-//            String[] record = itr.next();
-//            sumAirTime += new Integer(record[indAirTime]);
-//            sumDistance += new Integer(record[indDistance]);
-//        }
     }
     
     @Override        
     protected void writeResult(FormattedOutput fout) {
-//TODO  
         float v = (float)60.0 * sumInner.sumDistance / sumInner.sumAirTime;
         String result = String.format(Locale.US,"Average speed is %f km/hour", v);
         fout.addAnswer(getIndQ(), result);
@@ -605,7 +603,7 @@ public class AirlinesDataScienceRunner {
      */
     public static void main(String[] args) throws IOException {
         AirlinesDataScience ads = new AirlinesDataScience();
-        ads.play();
+       ads.play();
     }
 
 }
