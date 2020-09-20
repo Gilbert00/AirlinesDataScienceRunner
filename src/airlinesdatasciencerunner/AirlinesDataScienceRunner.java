@@ -5,7 +5,7 @@
  */
 /**
  * @author Kemper F.M. 
- * @version 1.0.8.2
+ * @version 1.0.8.3
  */
 package airlinesdatasciencerunner;
 
@@ -255,6 +255,8 @@ class Query1 extends QueryTemplate implements InterfaceDiverted {
     Map<String,HashVal> hash = new HashMap<>();
     List<Map.Entry<String,HashVal>> list;
     HashVal hashVal0 = new HashVal(0, 0, 0.0);
+    HashVal hashVal11 = new HashVal(1, 1, 0.0);
+    HashVal hashVal10 = new HashVal(1, 0, 0.0);
     
     @Override    
     protected boolean filteredRecord(String[] record) {
@@ -272,7 +274,7 @@ class Query1 extends QueryTemplate implements InterfaceDiverted {
                                                      reducing(hashVal0, 
                                                           (Q1Inner x) -> {String strCancelled = x.getCancelled();
                                                                     boolean isCancelled = (isInt(strCancelled) && (new Integer(strCancelled))>0);
-                                                                    return isCancelled ? new HashVal(1, 1, 0.0) : new HashVal(1, 0, 0.0);             
+                                                                    return isCancelled ? hashVal11 : hashVal10;             
                                                                    },
                                                              (HashVal v1, HashVal v2) -> new HashVal(v1.count+v2.count, v1.cancelled+v2.cancelled, 0.0)
                                                               ) ));
