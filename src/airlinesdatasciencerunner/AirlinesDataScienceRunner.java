@@ -5,7 +5,7 @@
  */
 /**
  * @author Kemper F.M. 
- * @version 1.0.8.1
+ * @version 1.0.8.2
  */
 package airlinesdatasciencerunner;
 
@@ -154,7 +154,7 @@ class QueryTemplate implements InterfaceCanceledEmpty, InterfaceDivertedEmpty{
     
     protected int getIndQ(){
         String cl = this.getClass().getSimpleName();
-        int indQ = new Integer(cl.substring(cl.length()-1)) ;
+        int indQ = new Integer(cl.replaceFirst("Query", "")) ;
         return indQ;        
     }
 }
